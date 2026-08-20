@@ -1,0 +1,85 @@
+
+/* COLOR Y BACKGROUND DEL H1 */
+h1 {
+    color: white; /*Aplicamos el color a la fuente */
+    background-color: #1e3a8a; /*Aplicamos el color y el fondo del h1 */
+    text-align: center; /*Lo centramos */
+    padding: 20px; /*separa el texto*/
+    border-radius: 10px; /*redondeamos las esquinas*/
+}
+/* COLOR y formato DEL H2 */
+h2 {
+    text-align: center;  /*centrado */
+    color: #1e3a8a; /*color */
+    font-size: 2rem; /* tamaño*/
+    margin-top: 30px; /*espacio arriba del elemento */
+    margin-bottom: 20px; /*espacio abajo del elemento */
+}
+/*FORMATO DEL CUERPO DEL SITIO*/
+body {
+    background: linear-gradient(to bottom, #87ceeb, #ffffff); /*FONDO */
+    font-variant: small-caps; /*FUENTE */
+    text-align: center; /*CENTRADO*/
+}
+/* Flexbox y los tipos de display*/
+.personajes{ /* Es el contenedor que organiza todos los personajes*/
+    display: flex; /*contenedor flexible */
+    font-size:larger;/* tamaño de letra grande*/
+    flex-wrap: wrap; /* salto de linea sino entran*/
+    justify-content: center; /* centra los elementos */
+    gap: 20px; /* 20px de separacion*/
+    width: 300px; /* ancho*/
+    margin: 0 auto; /*centra el contenedor */
+    margin-bottom: 30px /* 30px de espacio por debajo*/
+    
+}
+.personaje { /* Estilos de cada personaje*/
+    width: 120px;
+    text-align: center;
+    border: 2px solid #333;
+}
+
+/* DISEÑO RESPONSIVON */
+
+@media (max-width: 768px) {
+
+  
+    h1 {
+        font-size: 2rem;
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    
+    .personajes {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .personaje {
+        width: 80%;
+        max-width: 250px;
+    }
+
+    
+    button {
+        width: 80%;
+        max-width: 300px;
+        margin: 10px 0;
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    p {
+        padding: 0 15px;
+    }
+
+    
+    section {
+        padding: 10px;
+    }
+}
