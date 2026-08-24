@@ -1,0 +1,156 @@
+# 🎓 Sistema de Gestión de Estudiantes (CRUD en Java + MySQL)
+
+Este proyecto es una aplicación de consola desarrollada en **Java** que permite realizar la gestión completa (CRUD) de un listado de estudiantes, almacenando los datos de forma permanente en una base de datos **MySQL**.
+
+El objetivo principal del proyecto es aplicar **buenas prácticas de programación orientada a objetos**, separación de responsabilidades mediante **arquitectura por capas** y el patrón de diseño **DAO (Data Access Object)**.
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Lenguaje:** Java 26
+- **Gestor de Dependencias:** Maven
+- **Base de Datos:** MySQL
+- **Conector:** MySQL Connector/J (JDBC)
+- **IDE:** Visual Studio Code / IntelliJ IDEA
+
+---
+
+## 🏛️ ¿Cómo está organizado el código? (Arquitectura)
+
+Para mantener el código ordenado, mantenible y escalable, el sistema se divide en **3 capas bien definidas**:
+
+```text
+  [ Capa de Presentación ]  <--->  [ Capa de Datos (DAO) ]  <--->  [ Base de Datos ]
+  (Menú interactivo consola)        (Consultas SQL / JDBC)            (MySQL)
+                                             │
+                                             ▼
+                                   [ Capa de Dominio ]
+                                    (Clase Estudiante)
+```
+
+---
+
+1. Capa de Dominio (com.utn.dominio):
+   Contiene la clase Estudiante.java. Es la representación en Java de los datos que guardamos en la tabla SQL (ID, nombre, apellido, teléfono, email).
+
+2. Capa de Datos (com.utn.datos):
+   Conexion.java: Se encarga exclusivamente de abrir y cerrar el canal de comunicación seguro con MySQL.
+   IEstudianteDAO.java: Una interfaz que define el "contrato" con todas las operaciones permitidas (Listar, Buscar, Agregar, Modificar, Eliminar).
+   EstudianteDAO.java: Contiene la lógica real de las consultas SQL (SELECT, INSERT, UPDATE, DELETE) usando PreparedStatement.
+
+3. Capa de Presentación (com.utn.presentacion):
+   SistemaEstudiantesApp.java: Es la interfaz gráfica por consola. Muestra el menú, recibe lo que escribe el usuario y llama a la capa de datos. No ejecuta consultas SQL directamente.
+
+---
+
+_¿Qué hace cada archivo en la vida real?_
+Estudiante.java (El Modelo / La Bandeja)
+¿Qué es? Es una caja o molde donde guardamos los datos de un alumno (ID, nombre, apellido, teléfono, email) para poder moverlos de un lado a otro dentro del código.
+
+En el restaurante: Es la bandeja que lleva la comida. La bandeja no cocina ni atiende al cliente, solo transporta la hamburguesa (los datos) de la cocina a la mesa.
+
+_Conexion.java (El Camión / El Cable Telefónico)_
+¿Qué es? Es el encargado exclusivo de abrir y cerrar la puerta hacia MySQL.
+
+En el restaurante: Es el camión de suministros que viaja entre el restaurante y el depósito general. Si el camión no arranca (error de contraseña o puerto), nadie puede pedir insumos a la base de datos.
+
+_IEstudianteDAO.java (El Menú / El Contrato)_
+¿Qué es? Es una lista de promesas. No tiene código con lógica, solo dice qué cosas se pueden hacer: “acá se puede listar, buscar, agregar, modificar y eliminar”.
+
+En el restaurante: Es la carta / menú. Le dice al cliente qué platos se pueden pedir, pero el menú impreso no cocina la comida.
+
+👨*EstudianteDAO.java (El Cocinero / El Especialista)*
+¿Qué es? Es el único que sabe hablar en idioma SQL. Toma la bandeja (Estudiante), le pide viaje al camión (Conexion), escribe las consultas (SELECT, INSERT, UPDATE, DELETE) y trabaja con MySQL.
+
+En el restaurante: Es el chef. Sabe cómo abrir la heladera, cocinar los ingredientes y armar la bandeja.
+
+_SistemaEstudiantesApp.java (El Mozo / La Cara Visible)_
+¿Qué me muestra? El menú por consola con las opciones (1, 2, 3...). Lee lo que escribís en el teclado con el Scanner y muestra los mensajes de éxito o error.
+
+En el restaurante: Es el mozo. Atiende al cliente, le toma el pedido, va a la cocina a pedir la comida y vuelve a la mesa a traérsela. El mozo nunca entra a cocinar ni toca la heladera directamente.
+
+**_ Los 5 Elementos del Proyecto (+ MySQL) _**
+
+1. _Estudiante.java (La Ficha de Datos)_
+   ¿Qué es? Es un objeto pasivo. Solo contiene variables (id, nombre, apellido, telefono, email) con sus getters y setters.
+
+Su único trabajo: Sirve como una "ficha" o "caja" para transportar los datos de un alumno de un lado a otro.
+
+¿Con quién habla? Con nadie por iniciativa propia. Las demás clases lo usan para leerle o guardarle datos.
+
+2. _Conexion.java (La Llave de Acceso)_
+   ¿Qué es? La clase encargada de la seguridad y el canal de red hacia la base de datos. Guarda la URL, usuario y contraseña de MySQL.
+
+Su único trabajo: Abrir la puerta (conexión JDBC) cuando se la piden y permitir que cerremos la puerta al terminar.
+
+¿Con quién habla? Habla directamente con MySQL.
+
+3. _IEstudianteDAO.java (El Contrato / La Interfaz)_
+   ¿Qué es? Un archivo que no tiene código de ejecución, solo nombres de métodos (una lista de reglas/funciones).
+
+Su único trabajo: Decir QUÉ operaciones existen en el sistema (listarEstudiantes, buscarEstudiantePorId, agregarEstudiante, modificarEstudiante, eliminarEstudiante).
+
+¿Con quién habla? Es el punto de acuerdo entre la pantalla (SistemaEstudiantesApp) y la lógica (EstudianteDAO).
+
+4. _EstudianteDAO.java (El Empleado SQL)_
+   ¿Qué es? La clase que tiene la lógica real de acceso a datos. Firma el contrato (implements IEstudianteDAO) y escribe el código SQL.
+
+Su único trabajo: Traducir las órdenes de Java a lenguaje SQL (SELECT, INSERT, UPDATE, DELETE) y ejecutar las consultas.
+
+¿Con quién habla?
+
+Cumple el contrato de IEstudianteDAO.
+
+Le pide la entrada a Conexion.
+
+Desempaqueta o llena la ficha Estudiante.
+
+Envía las consultas a MySQL.
+
+5. _SistemaEstudiantesApp.java (La Pantalla / Consola)_
+   ¿Qué es? La interfaz de usuario (el menú con opciones 1, 2, 3... y el Scanner para leer el teclado).
+
+Su único trabajo: Mostrar opciones en pantalla, pedirle datos al usuario y mostrar los resultados (éxito o error).
+
+¿Con quién habla?
+
+Crea las fichas Estudiante con lo que el usuario tipea.
+
+Le pide las acciones a IEstudianteDAO (que por detrás ejecuta EstudianteDAO).
+
+NUNCA habla directamente con Conexion ni escribe SQL.
+
+6. _MySQL (La Base de Datos)_
+   ¿Qué es? El motor externo donde vive la tabla estudiantes2026.
+
+Su único trabajo: Guardar la información en el disco duro para que no se pierda al apagar la compu.
+
+¿Con quién habla? Recibe las consultas que le envía EstudianteDAO a través del puente que abrió Conexion.
+
+**Paso a Paso: ¿Cómo colaboran en una acción real?**
+Imaginemos que seleccionás la Opción 3: Agregar Estudiante en el menú.
+
+SistemaEstudiantesApp te pide Nombre, Apellido, Teléfono y Email por consola.
+
+SistemaEstudiantesApp crea una ficha:
+
+var estudiante = new Estudiante("Juan", "Pérez", "2604...", "juan@mail.com");
+
+SistemaEstudiantesApp llama al método del contrato:
+
+estudianteDao.agregarEstudiante(estudiante);
+
+EstudianteDAO toma la orden, le pide la llave a Conexion (Conexion.getConexion()) y abre la puerta a MySQL.
+
+EstudianteDAO le saca los datos a la ficha estudiante (getNombre(), etc.) y arma la consulta SQL:
+
+INSERT INTO estudiantes2026 VALUES (...)
+
+EstudianteDAO le manda la consulta a MySQL.
+
+MySQL guarda el registro en la tabla y le responde a EstudianteDAO: "¡Guardado con éxito!".
+
+EstudianteDAO cierra la conexión y le devuelve un true a SistemaEstudiantesApp.
+
+SistemaEstudiantesApp te muestra en pantalla: "✅ Estudiante agregado con éxito".
