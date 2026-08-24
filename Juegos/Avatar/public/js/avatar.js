@@ -2,17 +2,34 @@ let ataqueJugador;
 let ataqueEnemigo;
 let vidasJugador = 3;
 let vidasEnemigo = 3;
+//variables globales de la funcion "iniciarJuego"
+let botonPunio;
+let botonPatada;
+let botonBarrida;
+
+//variables globales de la funcion "combate"
+let spanvidasJugador;
+let spanvidasEnemigo;
+
+//variables globales de la funcion "crearMensaje"
+let sectionMensajes;
 
 function iniciarJuego(){
 
-    let botonPunio = document.getElementById('boton-punio')
-    botonPunio.addEventListener('click', ataquePunio)
+    botonPunio = document.getElementById('boton-punio')
+    botonPunio.addEventListener('click', function () {
+    ataque('punio')
+    })
 
-    let botonPatada = document.getElementById('boton-patada')
-    botonPatada.addEventListener('click', ataquePatada)
+    botonPatada = document.getElementById('boton-patada')
+    botonPatada.addEventListener('click', function () {
+    ataque('patada')
+    })
 
-    let botonBarrida = document.getElementById('boton-barrida')
-    botonBarrida.addEventListener('click', ataqueBarrida)
+    botonBarrida = document.getElementById('boton-barrida')
+    botonBarrida.addEventListener('click', function () {
+    ataque('barrida')
+    })
 
 }
 
@@ -42,18 +59,23 @@ function seleccionarPersonajeJugador() {
 }
 
 // ataques
-function ataquePunio(){
-    ataqueJugador = 'punio'
+function ataque(tipoAtaque){
+    ataqueJugador = tipoAtaque
     ataqueAleatorioEnemigo()
 }
-function ataquePatada(){
-    ataqueJugador = 'patada'
-    ataqueAleatorioEnemigo()
-}
-function ataqueBarrida(){
-    ataqueJugador = 'barrida'
-    ataqueAleatorioEnemigo()
-}
+// APLICACIÓN DE Don`t repeat yourself(DRY) = No te repitas
+//function ataquePunio(){
+  //  ataqueJugador = 'punio'
+   // ataqueAleatorioEnemigo()
+//}
+//function ataquePatada(){
+  //  ataqueJugador = 'patada'
+    //ataqueAleatorioEnemigo()
+//}
+//function ataqueBarrida(){
+  //  ataqueJugador = 'barrida'
+    //ataqueAleatorioEnemigo()
+//}
 
 function ataqueAleatorioEnemigo(){
     let ataqueAleatorio = aleatorio (1, 3)
@@ -73,8 +95,8 @@ function ataqueAleatorioEnemigo(){
 
 function combate(){
 
-    let spanvidasJugador = document.getElementById('vidas-jugador')
-    let spanvidasEnemigo = document.getElementById('vidas-enemigo')
+     spanvidasJugador = document.getElementById('vidas-jugador')
+     spanvidasEnemigo = document.getElementById('vidas-enemigo')
 
     //COMBATE 
     if (ataqueEnemigo == ataqueJugador) {
@@ -104,7 +126,7 @@ function combate(){
 }
 
 function crearMensaje (resultado){
-    let sectionMensajes = document.getElementById('mensajes')
+    sectionMensajes = document.getElementById('mensajes')
     let parrafo = document.createElement('p')
 
     parrafo.innerHTML = 'Tu personaje atacó con ' + ataqueJugador + 
@@ -128,9 +150,9 @@ function revisarFinDeJuego() {
 }
 
 function finalizarJuego() {
-    document.getElementById('boton-punio').disabled = true;
-    document.getElementById('boton-patada').disabled = true;
-    document.getElementById('boton-barrida').disabled = true;
+    botonPunio.disabled = true;
+    botonPatada.disabled = true;
+    botonBarrida.disabled = true;
 }
 
 // enemigo
