@@ -4,7 +4,7 @@
 /* Configuración global del fondo y la tipografía general */
 body {
     font-family: 'Cinzel', serif;
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe, #e0f2fe);
+    background-image: url("../media/fondo-avatar.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
