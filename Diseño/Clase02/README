@@ -1,0 +1,101 @@
+# — Documentación Integral de Diseño UX/UI y Arquitectura
+
+Este documento recopila de manera detallada y conectada el proceso completo de diseño, investigación, arquitectura de información, fundamentos cromáticos y prototipado.
+
+---
+
+## 1. Fundamentos y Metodología UX / UI
+
+El proyecto se diseñó articulando las dos disciplinas clave del desarrollo centrado en el usuario:
+
+- **UX (User Experience — Experiencia de Usuario):** Se enfoca en que la interacción del usuario sea fluida, accesible e intuitiva mediante un proceso secuencial de 4 fases:
+  1. **Investigación:** Recopilación de patrones de uso, análisis de cómo se comporta el usuario y evaluación comparativa (_benchmarking_) con aplicaciones gastronómicas similares.
+  2. **Análisis:** Procesamiento y organización de los datos recopilados, agrupándolos de acuerdo con las metas directas del usuario.
+  3. **Diseño:** Estructuración de flujos de navegación, arquitectura de la información y prototipos visuales orientados a las mejores prácticas de la industria.
+  4. **Pruebas de Usuario:** Validación temprana con usuarios mediante bocetos y esquemas (_sketches_) para ajustar la interacción antes del código final.
+
+- **UI (User Interface — Interfaz de Usuario):** Construye la capa gráfica y visual sobre la arquitectura UX:
+  - **Moodboard (Tablero de Inspiración):** Herramienta creativa que recopila referencias visuales, imágenes, conceptos y palabras clave en un único soporte para definir el tono de la marca.
+  - **Diseño Visual, Layout y Tipografía:** Definición de jerarquías de lectura, grillas (_layouts_) responsivas y componentes visuales consistentes.
+
+---
+
+## 2. Arquitectura de la Información y Flujos de Navegación
+
+### Mapa de Navegación del Sitio (Sitemap)
+
+Estructura jerárquica de contenidos para asegurar que el usuario acceda a cualquier sección en pocos clics:
+
+- **Home (Página Principal):**
+  - **Menú:** Promociones destacadas y Categorías clasificadas en _Hamburguesas_, _Acompañamientos_, _Bebidas_ y _Postres_.
+  - **Pedidos:** Resumen de la orden, formulario de datos de envío y pantalla de confirmación.
+  - **Contacto:** Listado y detalle de sucursales.
+  - **Páginas Externas:** Accesos directos a redes sociales (_Instagram, TikTok, Facebook_) y pasarelas de pago.
+
+### Flujo de Usuario para Pedidos (User Flow)
+
+Secuencia lógica paso a paso para el proceso de compra con control de estados y errores:
+
+1. **Inicio:** Entrada al sitio.
+2. **Menú:** Exploración del catálogo.
+3. **Detalle del Producto:** Visualización de ingredientes y especificaciones.
+4. **Añadir al Pedido:** Incorporación del producto a la orden.
+5. **Ver Pedido:** Revisión del carrito de compras.
+6. **Pagar Pedido:** Inicio del checkout.
+7. **Diligenciar Datos de Envío:** Formulario de entrega con bifurcación condicional:
+   - _Si los datos son inválidos:_ Salta a estado de **Error** y solicita corrección.
+   - _Si los datos son válidos:_ Redirige a la **Plataforma de Pagos**.
+8. **Plataforma de Pagos:** Procesamiento de la transacción:
+   - _Si el pago no es exitoso:_ Redirige a estado de **Error**.
+   - _Si el pago es exitoso:_ Muestra la pantalla de **Confirmación** y retorna al **Inicio**.
+
+---
+
+## 3. Teoría, Psicología y Sistema de Color
+
+### Fundamentos y Reglas de Diseño
+
+- **Principio «Menos es Más»:** Uso de una paleta acotada para evitar distracciones visuales y enfocar la atención del usuario en las acciones de compra.
+- **Formatos Estándar:** Definición rigurosa de valores en pantalla mediante **RGB** y códigos **Hexadecimales (HEX)**, garantizando contraste accesible.
+- **Armonías Cromáticas Estudiadas:** Análisis del círculo cromático mediante esquemas _Monocromáticos_, _Análogos_, _Complementarios_, _Triádicos_ y _Tétradas_.
+
+### Psicología del Color Aplicada
+
+- **Verde (Identidad Central):** Asociado a naturaleza, frescura, alimentos orgánicos, ética y calma; refuerza el valor de ingredientes premium y la seguridad al comprar.
+- **Negro / Gris Oscuro (Estructura y Textos):** Comunica sobriedad, elegancia, valor atemporal y garantiza lectura de alto contraste.
+- **Rojo / Coral (Alertas e Interacción):** Evoca energía, dinamismo y se reserva funcionalmente para cancelaciones, cierres de modal (❌) y estados de error.
+- **Azul (Soporte):** Inspira serenidad, confianza, inteligencia y profesionalismo en enlaces e información auxiliar.
+
+### Especificación de la Paleta de Colores
+
+| Tono Visual                                              | Nombre                  | HEX       | Aplicación en la Interfaz                       |
+| :------------------------------------------------------- | :---------------------- | :-------- | :---------------------------------------------- |
+| ![#3AA314](https://placehold.co/15x15/3AA314/3AA314.png) | **U-Green**             | `#3AA314` | Botones de compra y llamados a la acción (CTA)  |
+| ![#138842](https://placehold.co/15x15/138842/138842.png) | **U-Green Dark**        | `#138842` | Estados _hover_ y elementos activos             |
+| ![#709073](https://placehold.co/15x15/709073/709073.png) | **U-Green Desaturated** | `#709073` | Botones secundarios y badges sutiles            |
+| ![#17330D](https://placehold.co/15x15/17330D/17330D.png) | **U-Black**             | `#17330D` | Tipografía principal, títulos y botones oscuros |
+| ![#7E857F](https://placehold.co/15x15/7E857F/7E857F.png) | **U-Gray Dark**         | `#7E857F` | Textos secundarios y descripciones de platos    |
+| ![#BABDBA](https://placehold.co/15x15/BABDBA/BABDBA.png) | **U-Gray Medium**       | `#BABDBA` | Bordes estructurales y líneas divisorias        |
+| ![#CDD0CD](https://placehold.co/15x15/CDD0CD/CDD0CD.png) | **U-Gray Light**        | `#CDD0CD` | Contenedores e imágenes placeholder             |
+| ![#EEF2EE](https://placehold.co/15x15/EEF2EE/EEF2EE.png) | **U-Gray Ultra Light**  | `#EEF2EE` | Fondos de secciones alternas                    |
+| ![#FFFFFF](https://placehold.co/15x15/FFFFFF/FFFFFF.png) | **White**               | `#FFFFFF` | Contenedores modales y fondo de tarjetas        |
+| ![#2F80ED](https://placehold.co/15x15/2F80ED/2F80ED.png) | **U-Blue**              | `#2F80ED` | Enlaces y elementos de soporte                  |
+| ![#56CCF2](https://placehold.co/15x15/56CCF2/56CCF2.png) | **U-Blue Light**        | `#56CCF2` | Estados informativos claros                     |
+| ![#EB5757](https://placehold.co/15x15/EB5757/EB5757.png) | **U-Red**               | `#EB5757` | Botón cerrar modal (❌) y alertas críticas      |
+| ![#B84460](https://placehold.co/15x15/B84460/B84460.png) | **U-Red Dark**          | `#B84460` | Acentos secundarios de peligro/cancelación      |
+
+---
+
+## 4. Prototipado y Wireframes (Mobile & Desktop)
+
+Se desarrollaron wireframes de **bajo nivel** (bocetos funcionales) y **alto nivel** (maquetación digital estructurada) para adaptar la plataforma tanto a pantallas móviles como a escritorio:
+
+- **Header / Navegación:** Menú hamburguesa accesible en móviles y barra horizontal superior en escritorio (_Logo, Nosotros, Promociones, Menú, Contacto_).
+- **Hero Section:** Portada con título principal (**Steam Burgers**), bajada de texto secundario y botón de acceso rápido al menú.
+- **Bloque de Valor («Ingredientes»):** Sección con imagen destacada y texto institucional (_"10 años de tradición con los mejores ingredientes premium"_).
+- **Estrategia de Fidelización («Reto Semanal»):** Campaña en redes sociales donde los usuarios suben un video a Instagram con el hashtag `#steamBurgers` para obtener un 20% de descuento en su pedido.
+- **Catálogo de Productos («Nuestro Menú»):**
+  - Pestañas de filtrado numérico/categorías (1, 2, 3, 4).
+  - Tarjetas de producto compuestas por: nombre del plato, descripción concisa de ingredientes (máximo 3 a 4 líneas), precio con botón de agregar directo (`+$15.00`) e imagen ilustrativa.
+  - Botón persistente / flotante para **Ver Pedido**.
+- **Footer / Contacto:** Información de contacto directa (_Teléfono, Dirección, Horarios de atención_) y enlaces a perfiles oficiales (_Instagram, Facebook, TikTok_).
