@@ -1,98 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    
-    <!-- Define la codificación de caracteres -->
     <meta charset="UTF-8">
-
-    <!-- Ajusta la vista en dispositivos móviles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Título que aparece en la pestaña del navegador -->
-    <title>LA LEYENDA DE AANG: AVATAR </title>
+    <title>LA LEYENDA DE AANG: AVATAR</title>
     <link rel="stylesheet" href="./css/styles.css">
-    
-    
 </head>
 <body>
-    <!-- Título principal de la página, es único -->
-    <h1>AVATAR 🔥💧🌱🌪️</h1>
-    <!-- Sección de reglas del juego -->
-<section id="reglas">
-    <details>
-        <summary>Reglas del juego</summary>
 
-        <p>Primero debes seleccionar un personaje para comenzar.</p>
+    <!-- Encabezado principal del juego -->
+    <h1 class="titulo-avatar">
+        <span class="titulo-principal">LA LEYENDA DE AANG</span>
+        <span class="titulo-secundario">⚔️ EL DESAFÍO DEL AVATAR ⚔️</span>
+    </h1>   
 
-        <p>El jugador y el enemigo comienzan con 3 vidas cada uno.</p>
+    <!-- Sección desplegable con las instrucciones del juego -->
+    <section id="reglas">
+        <details>
+            <summary>Reglas del juego</summary>
+            <p>Primero debes seleccionar un personaje para comenzar.</p>
+            <p>El jugador y el enemigo comienzan con 3 vidas cada uno.</p>
+            <p>Reglas de combate:</p>
+            <ul>
+                <li>La patada le gana al puño</li>
+                <li>El puño le gana a la barrida</li>
+                <li>La barrida le gana a la patada</li>
+            </ul>
+        </details>
+    </section>
 
-        <p>Reglas de combate:</p>
-        <ul>
-            <li>La patada le gana al punio</li>
-            <li>El punio le gana a la barrida</li>
-            <li>La barrida le gana a la patada</li>
-        </ul>
+    <!-- Primera fase del flujo: Selección de avatar por parte del usuario -->
+    <section id="seleccionar-personaje">
+        <h2>Elige tu Personaje</h2>
+        <div class="personajes">
+            <div class="personaje">
+                <img src="./media/zuko.png" alt="Zuko">
+                <label for="zuko">Zuko</label>
+                <input type="radio" name="personaje" id="zuko" value="Zuko">
+            </div>
+            <div class="personaje">
+                <img src="./media/katara.png" alt="Katara">
+                <label for="katara">Katara</label>
+                <input type="radio" name="personaje" id="katara" value="Katara">
+            </div>
+            <div class="personaje">
+                <img src="./media/aang.png" alt="Aang">
+                <label for="aang">Aang</label>
+                <input type="radio" name="personaje" id="aang" value="Aang">
+            </div>
+            <div class="personaje">
+                <img src="./media/toph.png" alt="Toph">
+                <label for="toph">Toph</label>
+                <input type="radio" name="personaje" id="toph" value="Toph">
+            </div>
+        </div>
+        <button id="boton-personaje">Seleccionar</button>
+    </section>
 
-        <p>Puedes consultar esta información en cualquier momento del juego.</p>
-    </details>
-</section>
-
-   <!-- Sección para elegir el personaje -->
-<section id="seleccionar-personaje">
-    <h2>Elige tu Personaje</h2>
-
-    <div class="personajes">
-
-        <div class="personaje">
-            <label for="zuko">Zuko</label>
-            <input type="radio" name="personaje" id="zuko">
+    <!-- Segunda fase del flujo: Arena donde se ejecuta y visualiza el combate -->
+    <section id="seleccionar-ataque">
+        <h2>¡Que comience el duelo!</h2>
+        
+        <!-- Tarjetas donde se renderizan las métricas y los ataques visuales de los jugadores -->
+        <div class="arena-combate">
+            <div class="tarjeta-combate" id="tarjeta-jugador">
+                <h3 id="personaje-jugador">Jugador</h3>
+                <div class="corazones" id="vidas-jugador">❤️❤️❤️</div>
+                <div class="pantalla-ataque" id="ataque-visu-jugador">❓</div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="tarjeta-combate" id="tarjeta-enemigo">
+                <h3 id="personaje-enemigo">Enemigo</h3>
+                <div class="corazones" id="vidas-enemigo">❤️❤️❤️</div>
+                <div class="pantalla-ataque" id="ataque-visu-enemigo">❓</div>
+            </div>
         </div>
 
-        <div class="personaje">
-            <label for="katara">Katara</label>
-            <input type="radio" name="personaje" id="katara">
-        </div>
+        <!-- Banner dinámico con información sobre el resultado de la ronda -->
+        <div id="banner-resultado">Elige tu movimiento</div>
 
-        <div class="personaje">
-            <label for="aang">Aang</label>
-            <input type="radio" name="personaje" id="aang">
-        </div>
-
-        <div class="personaje">
-            <label for="toph">Toph</label>
-            <input type="radio" name="personaje" id="toph">
-        </div>
-
-    </div>
-
-    <button id="boton-personaje">Seleccionar</button>
-</section>
-
-   <!-- Sección donde se eligen los ataques -->
-   <section id="seleccionar-ataque">
-        <h2>Elige tu ataque</h2>
-
-        <p>Tu personaje <span id="personaje-jugador"></span> tiene <span id="vidas-jugador">3</span> vidas</p>
-
-        <p>El personaje <span id="personaje-enemigo"></span> del enemigo tiene <span id="vidas-enemigo">3</span> vidas</p>
-
-        <p>
-            <button id="boton-punio">Punio 👊</button>
+        <!-- Controles para ejecutar las acciones del personaje -->
+        <div class="contenedor-botones">
+            <button id="boton-punio">Puño 👊</button>
             <button id="boton-patada">Patada 🦵</button>
             <button id="boton-barrida">Barrida 👣</button>
-        </p>
-   </section>
+        </div>
+    </section>
 
-   <!-- Sección donde se mostrarán los mensajes -->
-   <section id="mensajes">
-   </section>
-
-   <!-- Botón de reinicio -->
-   <section id="reiniciar">
+    <!-- Tercera fase del flujo: Botón que se activa únicamente al finalizar la partida -->
+    <section id="reiniciar">
         <button id="boton-reiniciar">Reiniciar</button>
-   </section>
+    </section>
 
-   <!-- Archivo JS -->
-   <script src="js/avatar.js"></script>
+    <script src="./js/avatar.js"></script>
 </body>
 </html>

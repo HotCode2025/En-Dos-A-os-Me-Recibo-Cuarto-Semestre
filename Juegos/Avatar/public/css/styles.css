@@ -1,85 +1,282 @@
+/* Importación de tipografía Cinzel desde Google Fonts para mantener la estética temática */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
 
-/* COLOR Y BACKGROUND DEL H1 */
-h1 {
-    color: white; /*Aplicamos el color a la fuente */
-    background-color: #1e3a8a; /*Aplicamos el color y el fondo del h1 */
-    text-align: center; /*Lo centramos */
-    padding: 20px; /*separa el texto*/
-    border-radius: 10px; /*redondeamos las esquinas*/
-}
-/* COLOR y formato DEL H2 */
-h2 {
-    text-align: center;  /*centrado */
-    color: #1e3a8a; /*color */
-    font-size: 2rem; /* tamaño*/
-    margin-top: 30px; /*espacio arriba del elemento */
-    margin-bottom: 20px; /*espacio abajo del elemento */
-}
-/*FORMATO DEL CUERPO DEL SITIO*/
+/* Configuración global del fondo y la tipografía general */
 body {
-    background: linear-gradient(to bottom, #87ceeb, #ffffff); /*FONDO */
-    font-variant: small-caps; /*FUENTE */
-    text-align: center; /*CENTRADO*/
-}
-/* Flexbox y los tipos de display*/
-.personajes{ /* Es el contenedor que organiza todos los personajes*/
-    display: flex; /*contenedor flexible */
-    font-size:larger;/* tamaño de letra grande*/
-    flex-wrap: wrap; /* salto de linea sino entran*/
-    justify-content: center; /* centra los elementos */
-    gap: 20px; /* 20px de separacion*/
-    width: 300px; /* ancho*/
-    margin: 0 auto; /*centra el contenedor */
-    margin-bottom: 30px /* 30px de espacio por debajo*/
-    
-}
-.personaje { /* Estilos de cada personaje*/
-    width: 120px;
+    font-family: 'Cinzel', serif;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe, #e0f2fe);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 20px;
     text-align: center;
-    border: 2px solid #333;
+}
+/* Estilos decorativos para el título principal del juego */
+.titulo-avatar {
+    position: relative;
+    max-width: 900px;
+    margin: 20px auto 40px;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 58, 138, 0.95));
+    border: 3px solid #f59e0b;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.5), 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    overflow: hidden;
+}
+/* Pseudoelementos ::before y ::after para añadir detalles estéticos al título */
+.titulo-avatar::before {
+    content: "🔥 💧 🌱 🌪️";
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 12px;
 }
 
-/* DISEÑO RESPONSIVON */
+.titulo-principal {
+    display: block;
+    color: #ffffff;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-shadow: 3px 3px 0 #000, 0 0 10px rgba(255, 255, 255, 0.5);
+}
 
+.titulo-secundario {
+    display: block;
+    margin-top: 10px;
+    color: #f59e0b;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-shadow: 2px 2px 0 #000, 0 0 10px rgba(245, 158, 11, 0.7);
+}
+
+.titulo-avatar::after {
+    content: "━━━━━━━━━━━━ ✦ ━━━━━━━━━━━━";
+    display: block;
+    margin-top: 15px;
+    color: #f59e0b;
+    font-size: 1rem;
+}
+/* Subtítulos de las distintas secciones del juego */
+h2 {
+    color: #1e3a8a;
+    font-size: 2rem;
+    margin-bottom: 25px;
+}
+/* Estructura base para los contenedores tipo tarjeta de las secciones */
+section {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+/* Formato para la información de las reglas */
+details {
+    text-align: left;
+    font-size: 1rem;
+}
+
+summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #1e3a8a;
+}
+/* Layout en Flexbox para distribuir las opciones de selección de personajes */
+.personajes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+}
+
+.personaje {
+    width: 180px;
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    transition: 0.3s;
+    cursor: pointer;
+    border: 3px solid transparent;
+    box-sizing: border-box;
+}
+
+.personaje:hover {
+    transform: scale(1.05);
+    border-color: #f59e0b;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.personaje img {
+    width: 140px;
+    height: 160px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.personaje label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #1e3a8a;
+    cursor: pointer;
+}
+
+.personaje input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+/* Pseudo-clase :has para resaltar la tarjeta cuyo radio button interno esté seleccionado */
+.personaje:has(input[type="radio"]:checked) {
+    border-color: #f59e0b;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+/* Estilos compartidos por todos los botones interactivos */
+button {
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+/* Estado visual para botones deshabilitados (aplica el concepto DRY para no repetir estilos al bloquear controles) */
+button:disabled {
+    background-color: #9ca3af !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+#boton-personaje {
+    background: #1e3a8a;
+    margin-top: 25px;
+}
+
+#boton-personaje:hover {
+    background: #2747c5;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(30, 58, 138, 0.4);
+}
+/* Layout en Flexbox para alinear las tarjetas de los dos competidores */
+.arena-combate {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.tarjeta-combate {
+    background: #ffffff;
+    border: 3px solid #1e3a8a;
+    border-radius: 15px;
+    padding: 15px;
+    width: 140px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.corazones {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.pantalla-ataque {
+    font-size: 3rem;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.vs-badge {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #dc2626;
+}
+
+#banner-resultado {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 15px 0;
+    background: #e2e8f0;
+    color: #1e293b;
+    transition: all 0.3s ease;
+}
+/* Clases de utilidad para cambiar dinámicamente el color del banner según el resultado */
+.banner-ganaste { background: #dcfce7 !important; color: #15803d !important; }
+.banner-perdiste { background: #fee2e2 !important; color: #b91c1c !important; }
+.banner-empate  { background: #fef3c7 !important; color: #b45309 !important; }
+
+.contenedor-botones {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+#boton-punio { background: #dc2626; }
+#boton-patada { background: #1e90ff; }
+#boton-barrida { background: #16a34a; }
+
+#boton-punio:hover,
+#boton-patada:hover,
+#boton-barrida:hover {
+    transform: scale(1.05);
+}
+
+#boton-reiniciar {
+    background: #333333;
+}
+
+#boton-reiniciar:hover {
+    background: #000000;
+    transform: scale(1.05);
+}
+/* Keyframes y clases para las animaciones del combate */
+.animar-choque {
+    animation: choque 0.4s ease-in-out;
+}
+
+.animar-dano {
+    animation: sacudida 0.3s ease-in-out;
+}
+
+@keyframes choque {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@keyframes sacudida {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+/* Adaptación responsive para pantallas de dispositivos móviles */
 @media (max-width: 768px) {
-
-  
-    h1 {
-        font-size: 2rem;
-        padding: 15px;
-    }
-
-    h2 {
-        font-size: 1.5rem;
-    }
-
-    
-    .personajes {
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-
-    .personaje {
-        width: 80%;
-        max-width: 250px;
-    }
-
-    
-    button {
-        width: 80%;
-        max-width: 300px;
-        margin: 10px 0;
-        padding: 12px;
-        font-size: 1rem;
-    }
-
-    p {
-        padding: 0 15px;
-    }
-
-    
-    section {
-        padding: 10px;
-    }
+    body { padding: 10px; }
+    .titulo-avatar { padding: 25px 10px; }
+    .titulo-principal { font-size: 2rem; letter-spacing: 3px; }
+    .titulo-secundario { font-size: 1rem; letter-spacing: 2px; }
+    .personajes { flex-direction: column; align-items: center; }
+    .personaje { width: 280px; }
+    .contenedor-botones { flex-direction: column; align-items: center; }
+    button { width: 90%; margin-top: 5px; }
 }
