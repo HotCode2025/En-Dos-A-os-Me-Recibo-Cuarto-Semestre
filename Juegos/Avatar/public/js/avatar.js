@@ -1,28 +1,28 @@
 // === VARIABLES Y CONSTANTES ===
-// Variables para almacenar los estados dinámicos del estado de juego
-
+// Variables que SÍ cambian de valor durante la partida -> let
 let ataqueJugador;
 let ataqueEnemigo;
 let vidasJugador = 3;
 let vidasEnemigo = 3;
 
-// Declaración de variables para los botones del DOM
-let botonPunio;
-let botonPatada;
-let botonBarrida;
-let botonPersonajeJugador;
-let botonReiniciar;
+// Referencias globales del DOM: se buscan una sola vez, arriba de todo,
+// y se reutilizan en todas las funciones. Como se asignan en la misma línea
+// donde se declaran, pueden ser "const" (requiere que el HTML ya exista
+// al ejecutarse esta línea: script al final del <body> o con "defer").
+const botonPunio = document.getElementById('boton-punio');
+const botonPatada = document.getElementById('boton-patada');
+const botonBarrida = document.getElementById('boton-barrida');
+const botonPersonajeJugador = document.getElementById('boton-personaje');
+const botonReiniciar = document.getElementById('boton-reiniciar');
 
-// Declaración de variables para los contenedores dinámicos del DOM
-let spanPersonajeJugador;
-let spanPersonajeEnemigo;
-let spanVidasJugador;
-let spanVidasEnemigo;
+const spanPersonajeJugador = document.getElementById('personaje-jugador');
+const spanPersonajeEnemigo = document.getElementById('personaje-enemigo');
+const spanVidasJugador = document.getElementById('vidas-jugador');
+const spanVidasEnemigo = document.getElementById('vidas-enemigo');
 
-// Declaración de variables para la visibilidad de secciones
-let seccionSeleccionarPersonaje;
-let seccionSeleccionarAtaque;
-let seccionReiniciar;
+const seccionSeleccionarPersonaje = document.getElementById('seleccionar-personaje');
+const seccionSeleccionarAtaque = document.getElementById('seleccionar-ataque');
+const seccionReiniciar = document.getElementById('reiniciar');
 
 // Aplicando el principio DRY (Don't Repeat Yourself):
 // Definición de estructuras de datos inmutables reutilizables en lugar de duplicar valores en el código
@@ -30,23 +30,9 @@ const PERSONAJES = ['Zuko', 'Katara', 'Aang', 'Toph'];
 const EMOJIS_ATAQUE = { punio: '👊', patada: '🦵', barrida: '👣' };
 
 // === FUNCIÓN INICIAL ===
-// Asigna los eventos y captura las referencias del DOM una vez cargado el documento
+// Ya no busca elementos del DOM (eso se hizo arriba); solo define el
+// estado inicial de la interfaz y asigna los eventos.
 function iniciarJuego() {
-    botonPunio = document.getElementById('boton-punio');
-    botonPatada = document.getElementById('boton-patada');
-    botonBarrida = document.getElementById('boton-barrida');
-    botonPersonajeJugador = document.getElementById('boton-personaje');
-    botonReiniciar = document.getElementById('boton-reiniciar');
-
-    spanPersonajeJugador = document.getElementById('personaje-jugador');
-    spanPersonajeEnemigo = document.getElementById('personaje-enemigo');
-    spanVidasJugador = document.getElementById('vidas-jugador');
-    spanVidasEnemigo = document.getElementById('vidas-enemigo');
-
-    seccionSeleccionarPersonaje = document.getElementById('seleccionar-personaje');
-    seccionSeleccionarAtaque = document.getElementById('seleccionar-ataque');
-    seccionReiniciar = document.getElementById('reiniciar');
-
     // Estado inicial de la interfaz
     seccionSeleccionarAtaque.style.display = 'none';
     seccionReiniciar.style.display = 'none';
@@ -58,6 +44,7 @@ function iniciarJuego() {
     botonPersonajeJugador.addEventListener('click', seleccionarPersonajeJugador);
     botonReiniciar.addEventListener('click', () => location.reload());
 }
+
 // === SELECCIÓN DE PERSONAJES ===
 function seleccionarPersonajeJugador() {
     const inputs = document.querySelectorAll('input[name="personaje"]');
@@ -82,17 +69,19 @@ function seleccionarPersonajeJugador() {
     const random = Math.floor(Math.random() * PERSONAJES.length);
     spanPersonajeEnemigo.innerHTML = PERSONAJES[random];
 }
-    // === LOGICA DEL ATAQUE ==
+
+// === LOGICA DEL ATAQUE ===
 function ataque(tipoAtaque) {
     ataqueJugador = tipoAtaque;
 
-        // Generación aleatoria del ataque enemigo reutilizando una estructura en arreglo
+    // Generación aleatoria del ataque enemigo reutilizando una estructura en arreglo
     const opciones = ['punio', 'patada', 'barrida'];
     ataqueEnemigo = opciones[Math.floor(Math.random() * 3)];
 
     combate();
 }
-    // === RESOLUCIÓN DEL COMBATE Y ANIMACIONES ===
+
+// === RESOLUCIÓN DEL COMBATE Y ANIMACIONES ===
 function combate() {
     const visuJugador = document.getElementById('ataque-visu-jugador');
     const visuEnemigo = document.getElementById('ataque-visu-enemigo');
@@ -100,7 +89,7 @@ function combate() {
     const tarjetaJugador = document.getElementById('tarjeta-jugador');
     const tarjetaEnemigo = document.getElementById('tarjeta-enemigo');
 
-    // Mapeo dinámico visual consumiendo el objeto EMOJISATAQUE (DRY)
+    // Mapeo dinámico visual consumiendo el objeto EMOJIS_ATAQUE (DRY)
     visuJugador.innerHTML = EMOJIS_ATAQUE[ataqueJugador];
     visuEnemigo.innerHTML = EMOJIS_ATAQUE[ataqueEnemigo];
 
@@ -135,6 +124,7 @@ function combate() {
         tarjetaJugador.classList.add('animar-dano');
         setTimeout(() => tarjetaJugador.classList.remove('animar-dano'), 300);
     }
+
     // Actualización de la representación visual de vidas usando el método .repeat() (DRY)
     spanVidasJugador.innerHTML = '❤️'.repeat(Math.max(0, vidasJugador));
     spanVidasEnemigo.innerHTML = '❤️'.repeat(Math.max(0, vidasEnemigo));
@@ -148,6 +138,8 @@ function combate() {
         seccionReiniciar.style.display = 'block';
     }
 }
-//INICIO DEL CICLO DE VIDA 
-// Carga del script al finalizar el renderizado del DOM
-window.addEventListener('load', iniciarJuego);
+
+// INICIO DEL CICLO DE VIDA
+// El <script> está al final del <body>, así que el HTML ya existe:
+// se puede llamar directamente, sin esperar el evento "load".
+iniciarJuego();
