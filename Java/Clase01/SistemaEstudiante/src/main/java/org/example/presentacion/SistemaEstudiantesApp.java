@@ -120,7 +120,7 @@ public class SistemaEstudiantesApp {
                 System.out.println("Hasta pronto!!!");
                 salir = true;
             }//Fin caso 6
-            default -> System.out.println("Opción no reconocida, ingrese otra opción");
+            default -> System.out.println("Opción no reconocida, por favor ingrese otra opción");
         }
         return salir;
     }
