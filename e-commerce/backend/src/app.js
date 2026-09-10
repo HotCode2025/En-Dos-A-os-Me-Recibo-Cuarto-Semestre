@@ -8,15 +8,15 @@ const app = express();
 app.use(express.json());
 
 // Importación de rutas principales
-// const apiRouter = require('./routes/index'); // Asumiendo que agrupa tus rutas /api/v1
+const apiRouter = require('./routes/api'); 
 
 // Ruta principal de prueba
 app.get('/', (req, res) => {
   res.send('¡Servidor de Node y Express funcionando!');
 });
 
-// Ruta de prueba de base de datos (puedes dejarla aquí o moverla a un controller/route)
-const pool = require('../src/config/db');
+// Ruta de prueba de base de datos.
+const pool = require('./config/db');
 app.get('/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
@@ -28,7 +28,7 @@ app.get('/test-db', async (req, res) => {
 });
 
 // Montar el enrutador principal en /api/v1 (o la ruta que prefieras)
-// app.use('/api/v1', apiRouter);
+app.use('/api/v1', apiRouter);
 
 // Exportamos la app configurada (sin levantar el servidor aún)
 module.exports = app;
