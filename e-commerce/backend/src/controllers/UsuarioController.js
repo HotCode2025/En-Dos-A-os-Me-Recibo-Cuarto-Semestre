@@ -1,3 +1,4 @@
+//controlador de usuarios
 const usuarioService = require('../services/UsuarioService');
 
 const usuarioController = {
