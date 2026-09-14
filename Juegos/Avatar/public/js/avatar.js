@@ -2,7 +2,7 @@
 // Constante compartida por todos los personajes (jugador y enemigo).
 const VIDAS_INICIALES = 3;
 
-//  CLASE PERSONAJE (POO) 
+// === CLASE PERSONAJE (Programación Orientada a Objetos) ===
 // Una clase es el "molde" o plano: describe qué datos (propiedades) y
 // qué acciones (métodos) va a tener CADA personaje que creemos a partir
 // de ella. No es un personaje en sí — es la receta para fabricarlos.
@@ -36,24 +36,25 @@ class Personaje {
     }
 }
 
-// === PLANTILLA DE PERSONAJES DISPONIBLES ===
-// Acá está toda la info particular de cada personaje. Si mañana querés
-// agregar 100 o 1000 personajes más, solo agregás líneas acá — no hace
-// falta tocar ninguna otra parte del código.
-const DATOS_PERSONAJES = [
-    { nombre: 'Zuko', imagen: './media/zuko.png' },
-    { nombre: 'Katara', imagen: './media/katara.png' },
-    { nombre: 'Aang', imagen: './media/aang.png' },
-    { nombre: 'Toph', imagen: './media/toph.png' },
-    { nombre: 'Sokka', imagen: './media/sokka.png' }, // PERSONAJE CREADO
-    { nombre: 'Azula', imagen: './media/azula.png' }, // PERSONAJE CREADO 
-];
+// === INSTANCIAS DE CADA PERSONAJE ===
+// Acá sí se usa "new Personaje(...)": creamos, uno por uno, cada
+// personaje disponible como un objeto real (con sus propias vidas,
+// aunque todavía no estén jugando ninguna partida).
+const zuko = new Personaje('Zuko', './media/zuko.png');
+const katara = new Personaje('Katara', './media/katara.png');
+const aang = new Personaje('Aang', './media/aang.png');
+const toph = new Personaje('Toph', './media/toph.png');
+const sokka = new Personaje('Sokka', './media/sokka.png'); // PERSONAJE CREADO
+const azula = new Personaje('Azula', './media/azula.png'); // PERSONAJE CREADO
+const suki = new Personaje('Suki', './media/suki.jpg'); // Nuevo personaje 
 
-// Importante: DATOS_PERSONAJES son solo los DATOS (el "catálogo"), no
-// objetos Personaje todavía. Los objetos reales se crean con "new" recién
-// cuando se elige un participante (más abajo), para que el jugador y el
-// enemigo sean SIEMPRE dos objetos independientes, aunque les toque el
-// mismo nombre — así cada uno tiene sus propias vidas y su propio ataque.
+
+// === ARREGLO CON TODOS LOS PERSONAJES DISPONIBLES ===
+// Se crea vacío y se va llenando con .push(): si mañana agregás un
+// personaje nuevo, solo hace falta crearlo arriba (con "new") y
+// agregarlo acá con push — el resto del juego no se toca.
+const avatares = [];
+avatares.push(zuko, katara, aang, toph, sokka, azula,suki);
 
 // === VARIABLES Y CONSTANTES ===
 // Estas SÍ cambian durante la partida: van a apuntar a los objetos
@@ -116,22 +117,24 @@ function seleccionarPersonajeJugador() {
         return;
     }
 
-    // Busca en el catálogo los datos del personaje elegido, y con esos
-    // datos fabrica un objeto Personaje nuevo (con "new"): a partir de
-    // acá "jugador" es un objeto completo, con sus propias vidas y ataque.
-    const datosJugador = DATOS_PERSONAJES.find(datos => datos.nombre === nombreElegido);
-    jugador = new Personaje(datosJugador.nombre, datosJugador.imagen);
+    // Busca en el array "avatares" el objeto del personaje elegido, y con
+    // su nombre e imagen fabrica un objeto Personaje NUEVO (con "new"):
+    // así "jugador" no comparte instancia con el avatar guardado en el
+    // array ni con el enemigo, aunque hayan elegido el mismo personaje.
+    const avatarJugador = avatares.find(avatar => avatar.nombre === nombreElegido);
+    jugador = new Personaje(avatarJugador.nombre, avatarJugador.imagen);
     spanPersonajeJugador.innerHTML = jugador.nombre;
 
     // Transición de vistas en la interfaz
     seccionSeleccionarPersonaje.style.display = 'none';
     seccionSeleccionarAtaque.style.display = 'block';
 
-    // Selección aleatoria del rival: se eligen datos al azar del catálogo
-    // y se fabrica OTRO objeto Personaje nuevo e independiente para el enemigo.
-    const random = Math.floor(Math.random() * DATOS_PERSONAJES.length);
-    const datosEnemigo = DATOS_PERSONAJES[random];
-    enemigo = new Personaje(datosEnemigo.nombre, datosEnemigo.imagen);
+    // Selección aleatoria del rival: se elige un avatar al azar del array
+    // (usando .length, tal como lo vimos con los arrays) y se fabrica
+    // OTRO objeto Personaje nuevo e independiente para el enemigo.
+    const random = Math.floor(Math.random() * avatares.length);
+    const avatarEnemigo = avatares[random];
+    enemigo = new Personaje(avatarEnemigo.nombre, avatarEnemigo.imagen);
     spanPersonajeEnemigo.innerHTML = enemigo.nombre;
 }
 
