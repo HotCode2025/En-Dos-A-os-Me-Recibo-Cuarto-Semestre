@@ -31,4 +31,4 @@ app.get('/test-db', async (req, res) => {
 app.use('/api/v1', apiRouter);
 
 // Exportamos la app configurada (sin levantar el servidor aún)
-module.exports = app;
+module.exports = app; 
