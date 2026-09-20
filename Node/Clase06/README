@@ -1,0 +1,45 @@
+# Arquitectura y Fundamentos de Node.js
+
+Node.js es un entorno de ejecución (_runtime_) multiplataforma y de código abierto que permite ejecutar JavaScript fuera del navegador (en el servidor o localmente), utilizando el motor **V8** de Google Chrome.
+
+---
+
+## 1. ¿Cómo funciona Node.js por dentro?
+
+A diferencia de los servidores tradicionales que crean un hilo por cada cliente, Node.js utiliza una arquitectura basada en **un único hilo principal** asistido por un **conjunto de hilos secundarios** en segundo plano (a través de la librería `libuv`).
+
+## EVENT LOOP
+
+### Componentes clave
+
+- **Event Queue (Cola de Eventos):**
+  Lugar donde se apilan en orden de llegada todas las solicitudes entrantes: funciones (`Function`), solicitudes HTTP (`Request`) y eventos generales (`Event`).
+
+- **Event Loop (Bucle de Eventos):**
+  Es el corazón de Node.js. Corre en un **único hilo** evaluando constantemente si hay tareas pendientes en la cola:
+  - Si la tarea es simple y rápida (operaciones matemáticas, lógica en memoria), la resuelve de inmediato.
+  - Si la tarea es lenta, pesada o de Entrada/Salida (I/O), no se queda esperando: la delega al **Thread Pool** y pasa a atender la siguiente solicitud sin bloquear el sistema (_Non-blocking I/O_).
+
+- **Thread Pool (Piscina de Hilos):**
+  Conjunto de hilos auxiliares provistos por el sistema operativo para ejecutar en paralelo operaciones lentas o bloqueantes:
+  - **DB Ops:** Consultas a bases de datos.
+  - **File:** Lectura y escritura de archivos en el disco (`fs`).
+  - **Slow Ops:** Criptografía, compresión o cálculo intensivo.
+
+Una vez que un hilo secundario termina la operación pesada, devuelve el resultado a la cola para que el **Event Loop** ejecute su callback y entregue la respuesta.
+
+---
+
+## 2. Ventajas y Fortalezas
+
+- **Single-thread eficiente:** Maneja miles de conexiones concurrentes consumiendo muy poca memoria, ya que no reserva un hilo completo por usuario.
+- **Motor V8:** Compila JavaScript directamente a código máquina, ofreciendo una velocidad de ejecución sumamente alta.
+- **Ecosistema NPM:** Acceso al repositorio de paquetes más grande del mundo para instalar y distribuir librerías de forma modular.
+
+---
+
+## 3. Limitaciones
+
+- **Tareas intensivas en CPU:** Tareas pesadas como procesamiento de video, renderizado 3D o cálculos matemáticos complejos pueden congelar el hilo principal (_Event Loop_).
+  - _Solución:_ Usar el módulo `worker_threads` (que levanta instancias independientes) o delegar el procesamiento a servicios externos.
+- **Calidad heterogénea en NPM:** Al ser un registro abierto, existen paquetes desactualizados, con poca documentación o con vulnerabilidades de seguridad que requieren auditoría constante.
