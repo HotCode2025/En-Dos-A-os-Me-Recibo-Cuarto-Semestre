@@ -1,4 +1,5 @@
 const UsuarioModel = require('../models/UsuarioModel');
+const password = require('../utils/passwordHasd');
 
 const usuarioService = {
   async getUsuarios() {
@@ -7,17 +8,23 @@ const usuarioService = {
     return usuarios;
   },
 
+  //método para añadir un nuevo usuario.
   async postUsuario(datosUsuario) {
-
-    // Lógica de negocio (ejemplo: validar que vengan datos obligatorios)
+    //se realiza el hash del password
+    const hashedPassword = await password.hash(datosUsuario.password);
+    datosUsuario.password = hashedPassword
+    //verificamos el tipo de usuario.
+    /*
+      El sistema por el momento admite dos tipos: ADMIN o CLIENTE, al registrarse un nuevo 
+      usuario el campo rol vendra null, por lo cual, por defecto se le asignará el rol de CLIENTE. 
+    */ 
     
-    /*if (!datosUsuario.email || !datosUsuario.nombre) {
-      throw new Error('El nombre y el email son obligatorios');
-    }*/
-
-    // Llamada al modelo para guardar en BD
-    const nuevoUsuario = await UsuarioModel.postUsuario(datosUsuario);
-    return nuevoUsuario;
+    if(datosUsuario.rol == null) datosUsuario.rol = "CLIENTE"; 
+    
+    const nuevoUsuario = { ...datosUsuario };
+    // Llamada al modelo para guardar en DB
+    const usuarioDB = await UsuarioModel.postUsuario(nuevoUsuario);
+    return usuarioDB;
   }
 
 };

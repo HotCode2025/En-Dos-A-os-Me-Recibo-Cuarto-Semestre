@@ -8,20 +8,26 @@ const Usuario = {
 
  //método para añadir un nuevo usuario 
   async postUsuario(datosUsuario) {
-    const { nombre } = datosUsuario; // Ajusta los campos según tu tabla
-    
-    return nombre; 
+    //1. Obtenermos los campos del usuario
 
-    /*
+    const { nombre, apellido, email, password, telefono, rol } = datosUsuario;
+    
+    //2. Preparamos la consulta
     const query = `
-      INSERT INTO usuario (nombre, email, password) 
-      VALUES ($1, $2, $3) 
-      RETURNING *
+      INSERT INTO usuario (nombre, apellido, email, password_hash, telefono, rol) 
+      VALUES ($1, $2, $3, $4, $5, $6) 
+      RETURNING id, nombre, apellido, email, telefono, rol, fecha_creacion
     `;
-    const values = [nombre, email, password];
+    
+    //3. Pasamos los valores de la consulta
+    const values = [nombre, apellido, email, password, telefono, rol];
+    
+    //4. Ejecutamos la consulta y nos devuelve el resultado
     const result = await pool.query(query, values);
-    return result.rows[0]; // Retorna el usuario recién creado
-    */
+
+    // Retorna el usuario recién creado
+    return result.rows[0]; 
+    
   }
 
 };
