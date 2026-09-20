@@ -11,15 +11,16 @@ const usuarioController = {
     }
   },
 
-  async postUsuario(req, res) {
-
-    try {
-      const datosUsuario = req.body;
-      const nuevoUsuario = await usuarioService.postUsuario(datosUsuario);
-      res.status(201).json(nuevoUsuario);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+  async loginUsuario(email, password) {
+    const usuario = await UsuarioModel.getByEmail(email);
+    if (!usuario || usuario.password !== password) {
+      throw new Error('Credenciales inválidas');
     }
+
+    // Generamos el token usando el utilitario
+    const token = generarToken({ id: usuario.id, email: usuario.email });
+
+    return { usuario, token };
   }
 
 };

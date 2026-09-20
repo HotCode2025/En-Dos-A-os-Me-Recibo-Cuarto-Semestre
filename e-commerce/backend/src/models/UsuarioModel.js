@@ -16,7 +16,7 @@ const Usuario = {
     const query = `
       INSERT INTO usuario (nombre, apellido, email, password_hash, telefono, rol) 
       VALUES ($1, $2, $3, $4, $5, $6) 
-      RETURNING id, nombre, apellido, email, telefono, rol, fecha_creacion
+      RETURNING id, nombre, apellido, email, telefono, rol, fecha_registro
     `;
     
     //3. Pasamos los valores de la consulta
