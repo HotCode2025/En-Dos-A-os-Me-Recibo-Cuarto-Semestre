@@ -52,8 +52,16 @@ const validarUsuario = {
 
         resultValidacion
     ],
-    edit: [ /* reglas para PUT /users/:id */],
-    login: [ /* reglas para POST /auth/login */]
+    //reglas para POST /auth/login 
+    login: [body('email')
+        .trim()
+        .notEmpty().withMessage('El email es requerido')
+        .isEmail().withMessage('Debe tener formato de correo válido'),
+
+    body('password')
+        .notEmpty().withMessage('La contraseña es requerida')
+    ],
+    edit: [ /* reglas para PUT /users/:id */]
 };
 
 module.exports = validarUsuario;

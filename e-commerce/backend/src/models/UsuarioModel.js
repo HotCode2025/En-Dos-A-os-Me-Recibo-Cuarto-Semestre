@@ -6,29 +6,46 @@ const Usuario = {
     return result.rows;
   },
 
- //método para añadir un nuevo usuario 
+  //método para añadir un nuevo usuario 
   async postUsuario(datosUsuario) {
     //1. Obtenermos los campos del usuario
 
     const { nombre, apellido, email, password, telefono, rol } = datosUsuario;
-    
+
     //2. Preparamos la consulta
     const query = `
       INSERT INTO usuario (nombre, apellido, email, password_hash, telefono, rol) 
       VALUES ($1, $2, $3, $4, $5, $6) 
       RETURNING id, nombre, apellido, email, telefono, rol, fecha_registro
     `;
-    
+
     //3. Pasamos los valores de la consulta
     const values = [nombre, apellido, email, password, telefono, rol];
-    
+
     //4. Ejecutamos la consulta y nos devuelve el resultado
     const result = await pool.query(query, values);
 
     // Retorna el usuario recién creado
-    return result.rows[0]; 
-    
+    return result.rows[0];
+
+  },
+
+  async getUsuarioBy(campo, valor) {
+    // 1. Validamos las columnas permitidas
+    const columnasPermitidas = ['id', 'email', 'username', 'telefono'];
+
+    if (!columnasPermitidas.includes(campo)) {
+      throw new Error(`Búsqueda por campo no permitido: ${campo}`);
+    }
+
+    // 1. Construir la consulta.
+    const query = `SELECT *, password_hash FROM usuario WHERE ${campo} = $1`;
+    const result = await pool.query(query, [valor]);
+
+    // 2. Retornarmos el primer resultado (o null si no existe)
+    return result.rows[0] || null;
   }
+
 
 };
 
