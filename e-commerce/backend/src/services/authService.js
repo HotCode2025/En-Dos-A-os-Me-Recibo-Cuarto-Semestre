@@ -42,7 +42,7 @@ const authService = {
         // 3. Si pasa ambas validaciones, el login es exitoso
         // Aquí limpiamos los datos que no queremos enviar, generamos el token y lo retornas
         const { password_hash, ...datosPublicos } = usuario;
-        const token = await jwtUtils.generarJWT(usuario.id); // Tu función para crear el JWT
+        const token = await jwtUtils.generarJWT(usuario.id, usuario.email, usuario.rol); // función para crear el JWT
 
         return { usuario: datosPublicos, token };
     }

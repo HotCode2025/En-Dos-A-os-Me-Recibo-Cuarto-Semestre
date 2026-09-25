@@ -1,7 +1,7 @@
 const jwtUtils = require('../utils/jwtUtils');
 
 const autenticacionMiddleware = {
-    verificarToken (req, res, next) {
+    verificarToken(req, res, next) {
         // 1. Obtenemos el encabezado de autorización
         const cabeceraAutenticacion = req.headers['authorization'];
 
@@ -20,8 +20,9 @@ const autenticacionMiddleware = {
             // 3. Validar si el token es legítimo
             const datosDecodificados = jwtUtils.verificarTokenJWT(token);
 
-            // 4. Guardamos el ID del usuario directamente en la petición (req)
-            req.usuarioId = datosDecodificados.id;
+            // 4. Guardamos el id, email, rol del usuario directamente en la petición (req)
+            const { id, email, rol } = datosDecodificados;
+            req.usuario = { id, email, rol };
 
             // 5. Todo está bien, damos paso a la siguiente función
             next();

@@ -8,4 +8,4 @@ const usuarioController = require('../controllers/UsuarioController');
 router.get('/', usuarioController.getAllUsuarios);
 
 
-module.exports = router;
+module.exports = router; 

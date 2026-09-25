@@ -4,11 +4,13 @@ const JWT_EXPIRES_IN = '2h'; // Tiempo de expiración configurable
 
 const jwtUtils = {
 
-    generarJWT(id) {
+    generarJWT(id, email, rol) {
 
         return new Promise((res, rej) => {
             const payload = {
                 id,
+                email, 
+                rol
             }
             jwt.sign(payload, JWT_SECRET, {
                 expiresIn: JWT_EXPIRES_IN

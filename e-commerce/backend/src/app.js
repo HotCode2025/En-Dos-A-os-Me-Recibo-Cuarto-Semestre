@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 const pool = require('./config/db');
 app.get('/test-db', async (req, res) => {
   try {
-    const result = await pool.query('SELECT NOW()');
+    const result = await pool.query('SELECT NOW()'); 
     res.json({ message: 'Conexión funcionando', time: result.rows[0].now });
   } catch (err) {
     console.error(err);
@@ -31,4 +31,4 @@ app.get('/test-db', async (req, res) => {
 app.use('/api/v1', apiRouter);
 
 // Exportamos la app configurada (sin levantar el servidor aún)
-module.exports = app; 
+module.exports = app;
