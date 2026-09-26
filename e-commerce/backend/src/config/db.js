@@ -1,16 +1,24 @@
-const { Pool } = require('pg');
+const { Pool } = require("pg");
+require("dotenv").config();
 
-// Neon requiere SSL activado para conexiones remotas seguras
+// Verificamos si la URL de la base de datos apunta a tu PC local
+const isLocal = process.env.DATABASE_URL
+  ? process.env.DATABASE_URL.includes("localhost")
+  : true;
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  // Si es local apagamos el SSL, si es Neon (nube) lo encendemos.
+  ssl: isLocal ? false : { rejectUnauthorized: false },
 });
 
-// Probar la conexión
-pool.connect()
-  .then(() => console.log('¡Conectado exitosamente a la base de datos de Neon!'))
-  .catch(err => console.error('Error de conexión a la base de datos:', err));
+pool.on("connect", () => {
+  // console.log('Conexión a la base de datos establecida.');
+});
+
+pool.on("error", (err) => {
+  console.error("Error inesperado en el pool de la base de datos", err);
+  process.exit(-1);
+});
 
 module.exports = pool;
