@@ -30,6 +30,7 @@ const Usuario = {
 
   },
 
+  // Método que esta usandose en: auth (para el lógin), para mostrar el perfil del usuario. 
   async getUsuarioBy(campo, valor) {
     // 1. Validamos las columnas permitidas
     const columnasPermitidas = ['id', 'email', 'username', 'telefono'];
@@ -44,9 +45,40 @@ const Usuario = {
 
     // 2. Retornarmos el primer resultado (o null si no existe)
     return result.rows[0] || null;
+  },
+
+  //método que le permite a un usuario modificar su perfil
+  async update(id, { nombre, apellido, email, telefono, calle_numero, ciudad, codigo_postal, pais }) {
+    const query = `
+      UPDATE usuario
+      SET 
+        nombre = COALESCE($1, nombre),
+        apellido = COALESCE($2, apellido),
+        email = COALESCE($3, email),
+        telefono = COALESCE($4, telefono),
+        calle_numero = COALESCE($5, calle_numero),
+        ciudad = COALESCE($6, ciudad),
+        codigo_postal = COALESCE($7, codigo_postal),
+        pais = COALESCE($8, pais)
+      WHERE id = $9
+      RETURNING id, nombre, apellido, email, telefono, calle_numero, ciudad, codigo_postal, pais, rol;
+    `;
+    
+    const values = [
+      nombre || null, 
+      apellido || null, 
+      email || null, 
+      telefono || null, 
+      calle_numero || null, 
+      ciudad || null, 
+      codigo_postal || null, 
+      pais || null, 
+      id
+    ];
+
+    const { rows } = await pool.query(query, values);
+    return rows[0]; // Retorna el usuario actualizado
   }
-
-
 };
 
 module.exports = Usuario;

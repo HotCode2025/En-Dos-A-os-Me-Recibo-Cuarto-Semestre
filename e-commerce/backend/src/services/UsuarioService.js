@@ -3,11 +3,34 @@ const password = require('../utils/passwordHasd');
 
 
 const usuarioService = {
+  //Método para mostrar todos los usuarios
   async getUsuarios() {
-    // Aquí se podría agregar lógica de negocio si la necesitamos (ej. transformar datos, filtrar, etc.)
     const usuarios = await UsuarioModel.getAllUsuarios();
-    return usuarios;
+    // Omitimos información sensible antes de retornarlo
+    const { password_hash, ...usuarioModificado } = usuarios;
+    return usuarioModificado;
   },
+
+  // Obtener la información del perfil
+  async getPerfil(usuarioId) {
+
+    const usuario = await UsuarioModel.getUsuarioBy("id", usuarioId);
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    // Omitimos información sensible antes de retornarlo
+    const { password_hash, ...usuarioModificado } = usuario;
+    return usuarioModificado;
+  },
+
+  // Actualizar datos del perfil
+  async modificarPerfil(usuarioId, datosNuevos) {
+    const usuarioActualizado = await UsuarioModel.update(usuarioId, datosNuevos);
+    // Omitimos información sensible antes de retornarlo
+    const { password_hash, ...usuarioModificado } = usuarioActualizado;
+    return usuarioModificado;
+  }
 
 };
 
