@@ -51,4 +51,4 @@ const crearTablas = async () => {
   }
 };
 
-crearTablas();
+//crearTablas();
