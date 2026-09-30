@@ -4,8 +4,6 @@ const autenticacionMiddleware = {
   verificarToken(req, res, next) {
     // 1. Obtenemos el encabezado de autorización
     const cabeceraAutenticacion = req.headers["authorization"];
-    // AGREGA ESTA LÍNEA:
-    console.log("Lo que recibe el middleware:", cabeceraAutenticacion);
 
     // Separamos el texto por el espacio para obtener solo el token (quitando 'Bearer')
     const token = cabeceraAutenticacion && cabeceraAutenticacion.split(" ")[1];
@@ -23,7 +21,10 @@ const autenticacionMiddleware = {
       const datosDecodificados = jwtUtils.verificarTokenJWT(token);
 
       // 4. Guardamos el ID del usuario directamente en la petición (req)
-      req.usuario = { id: datosDecodificados.id };
+      req.usuario = {
+        id: datosDecodificados.id,
+        rol: datosDecodificados.rol,
+      };
 
       // 5. Todo está bien, damos paso a la siguiente función
       next();

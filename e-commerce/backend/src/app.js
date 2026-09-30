@@ -9,6 +9,8 @@ app.use(express.json());
 // Importación de rutas principales
 const apiRouter = require("./routes/api");
 const carritoRoute = require("./routes/carritoRoute");
+const ordenRoutes = require("./routes/ordenRoute");
+const metodoPagoRoutes = require("./routes/metodoPagoRoute");
 
 // Ruta principal de prueba
 app.get("/", (req, res) => {
@@ -30,6 +32,8 @@ app.get("/test-db", async (req, res) => {
 // Montar el enrutador principal en /api/v1 (o la ruta que prefieras)
 app.use("/api/v1", apiRouter);
 app.use("/api/v1/carrito", carritoRoute);
+app.use("/api/v1/ordenes", ordenRoutes);
+app.use("/api/v1/metodos-pago", metodoPagoRoutes);
 
 // Exportamos la app configurada (sin levantar el servidor aún)
 module.exports = app;
