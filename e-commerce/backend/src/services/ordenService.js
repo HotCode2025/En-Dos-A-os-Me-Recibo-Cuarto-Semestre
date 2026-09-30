@@ -37,6 +37,34 @@ const ordenService = {
   getAllOrdenes: async () => {
     return await ordenModel.obtenerTodasLasOrdenes();
   },
+
+  actualizarEstado: async (ordenId, nuevoEstado) => {
+    // Validamos que el estado sea uno de los permitidos por tu lógica de negocio
+    const estadosPermitidos = [
+      "Pendiente",
+      "Pagado",
+      "Enviado",
+      "Entregado",
+      "Cancelado",
+    ];
+
+    if (!estadosPermitidos.includes(nuevoEstado)) {
+      throw new Error(
+        `Estado inválido. Los estados permitidos son: ${estadosPermitidos.join(", ")}`,
+      );
+    }
+
+    const ordenActualizada = await ordenModel.actualizarEstadoOrden(
+      ordenId,
+      nuevoEstado,
+    );
+
+    if (!ordenActualizada) {
+      throw new Error("La orden especificada no existe");
+    }
+
+    return ordenActualizada;
+  },
 };
 
 module.exports = ordenService;

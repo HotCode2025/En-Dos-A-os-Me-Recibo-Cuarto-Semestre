@@ -86,6 +86,17 @@ const ordenModel = {
     const result = await pool.query(query);
     return result.rows;
   },
+
+  actualizarEstadoOrden: async (ordenId, nuevoEstado) => {
+    const query = `
+      UPDATE orden 
+      SET estado = $1 
+      WHERE id = $2 
+      RETURNING *
+    `;
+    const result = await pool.query(query, [nuevoEstado, ordenId]);
+    return result.rows[0];
+  },
 };
 
 module.exports = ordenModel;

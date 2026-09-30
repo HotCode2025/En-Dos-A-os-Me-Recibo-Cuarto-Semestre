@@ -14,4 +14,14 @@ router.get("/", verificarToken, carritoController.getMiCarrito);
 // POST /api/carrito/agregar -> Suma un producto al carrito
 router.post("/agregar", verificarToken, carritoController.agregarProducto);
 
+// PUT /api/v1/carrito/restar -> Resta cantidad a un producto del carrito
+router.put("/restar", verificarToken, carritoController.restarProducto);
+
+// DELETE /api/v1/carrito/quitar/:productoId -> Quita el producto por completo
+router.delete(
+  "/quitar/:productoId",
+  verificarToken,
+  carritoController.quitarProducto,
+);
+
 module.exports = router;

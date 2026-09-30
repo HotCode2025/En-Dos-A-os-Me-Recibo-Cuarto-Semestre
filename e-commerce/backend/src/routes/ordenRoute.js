@@ -23,5 +23,12 @@ router.get(
   permitRoles("ADMIN"),
   ordenController.getAllOrdenes,
 );
+// PUT /api/v1/ordenes/:id/estado -> Actualiza el estado de una orden
+router.put(
+  "/:id/estado",
+  verificarToken,
+  permitRoles("ADMIN"),
+  ordenController.actualizarEstado,
+);
 
 module.exports = router;

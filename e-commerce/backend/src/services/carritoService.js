@@ -45,6 +45,47 @@ const carritoService = {
       );
     }
   },
+  restarItem: async (usuarioId, productoId, cantidad) => {
+    const carritoId = await carritoModel.obtenerCarritoPorUsuario(usuarioId);
+
+    const itemExistente = await carritoModel.buscarItemEnCarrito(
+      carritoId,
+      productoId,
+    );
+
+    if (!itemExistente) {
+      throw new Error("El producto no se encuentra en el carrito");
+    }
+
+    const nuevaCantidad = itemExistente.cantidad - cantidad;
+
+    if (nuevaCantidad <= 0) {
+      // Si al restar la cantidad llega a 0 o menos, lo eliminamos directamente
+      return await carritoModel.eliminarItem(itemExistente.id);
+    } else {
+      // Si aún queda cantidad, simplemente la actualizamos
+      return await carritoModel.actualizarCantidadItem(
+        itemExistente.id,
+        nuevaCantidad,
+      );
+    }
+  },
+
+  quitarItem: async (usuarioId, productoId) => {
+    const carritoId = await carritoModel.obtenerCarritoPorUsuario(usuarioId);
+
+    const itemExistente = await carritoModel.buscarItemEnCarrito(
+      carritoId,
+      productoId,
+    );
+
+    if (!itemExistente) {
+      throw new Error("El producto no se encuentra en el carrito");
+    }
+
+    // Eliminamos el producto por completo sin importar la cantidad
+    return await carritoModel.eliminarItem(itemExistente.id);
+  },
 };
 
 module.exports = carritoService;

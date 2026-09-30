@@ -54,6 +54,13 @@ const carritoModel = {
     const result = await pool.query(query, [carritoId, productoId, cantidad]);
     return result.rows[0];
   },
+
+  eliminarItem: async (itemId) => {
+    // Asegúrate de que 'item_carrito' coincida exactamente con las demás funciones de tu modelo
+    const query = "DELETE FROM item_carrito WHERE id = $1 RETURNING *";
+    const result = await pool.query(query, [itemId]);
+    return result.rows[0];
+  },
 };
 
 module.exports = carritoModel;
