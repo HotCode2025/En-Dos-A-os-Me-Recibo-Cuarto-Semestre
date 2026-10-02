@@ -16,10 +16,14 @@ const carritoModel = {
 
   obtenerItemsCarrito: async (carritoId) => {
     const queryItems = `
-      SELECT ic.id, ic.id_producto as producto_id, p.nombre, ic.cantidad, p.precio as precio_unitario, 
+      SELECT ic.id, ic.id_producto AS producto_id, p.nombre, ic.cantidad,
+             p.precio AS precio_unitario, p.imagen_url, m.nombre AS marca,
+             c.nombre AS categoria,
              (ic.cantidad * p.precio) as subtotal
       FROM item_carrito ic
       JOIN producto p ON ic.id_producto = p.id
+      JOIN marca m ON m.id = p.id_marca
+      JOIN categorias c ON c.id = p.id_categoria
       WHERE ic.id_carrito = $1
     `;
     const result = await pool.query(queryItems, [carritoId]);
@@ -48,7 +52,7 @@ const carritoModel = {
 
   agregarItemNuevo: async (carritoId, productoId, cantidad) => {
     const query = `
-      INSERT INTO item_carrito (id_carrito, id_producto, cantidad) 
+      INSERT INTO item_carrito (id_carrito, id_producto, cantidad)
       VALUES ($1, $2, $3) RETURNING *
     `;
     const result = await pool.query(query, [carritoId, productoId, cantidad]);

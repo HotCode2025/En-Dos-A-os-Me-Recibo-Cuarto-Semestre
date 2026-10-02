@@ -5,10 +5,7 @@ const password = require('../utils/passwordHasd');
 const usuarioService = {
   //Método para mostrar todos los usuarios
   async getUsuarios() {
-    const usuarios = await UsuarioModel.getAllUsuarios();
-    // Omitimos información sensible antes de retornarlo
-    const { password_hash, ...usuarioModificado } = usuarios;
-    return usuarioModificado;
+    return UsuarioModel.getAllUsuarios();
   },
 
   // Obtener la información del perfil

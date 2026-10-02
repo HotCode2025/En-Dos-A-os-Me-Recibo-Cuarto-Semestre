@@ -2,7 +2,9 @@ const pool = require('../config/db');
 
 const Usuario = {
   async getAllUsuarios() {
-    const result = await pool.query('SELECT * FROM usuario');
+    const result = await pool.query(
+      'SELECT id, nombre, apellido, email, telefono, fecha_registro, rol, calle_numero, ciudad, codigo_postal, pais FROM usuario ORDER BY id',
+    );
     return result.rows;
   },
 

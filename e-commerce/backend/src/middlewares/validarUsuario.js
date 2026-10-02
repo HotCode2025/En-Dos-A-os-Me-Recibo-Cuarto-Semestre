@@ -44,12 +44,6 @@ const validarUsuario = {
             .notEmpty().withMessage('El teléfono es requerido')
             .isNumeric().withMessage('El teléfono debe ser numérico'),
 
-        /*En el campo rol se valida que loS tipos de datos aceptados son: NULL (no se envió el campo, 
-        es este caso sería cuando se registra un usuario), ADMIN o CLIENTE*/
-        body('rol')
-            .optional()
-            .isIn(['ADMIN', 'CLIENTE']).withMessage('El rol debe ser ADMIN o CLIENTE'),
-
         resultValidacion
     ],
     //reglas para POST /auth/login 

@@ -5,6 +5,9 @@ import ProductCatalog from '../components/ProductCatalog.vue'
 defineProps({
   products: { type: Array, required: true },
   searchQuery: { type: String, default: '' },
+  isAdmin: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false },
+  loadError: { type: String, default: '' },
 })
 
 const emit = defineEmits(['add-to-cart', 'clear-search'])
@@ -73,6 +76,9 @@ const emit = defineEmits(['add-to-cart', 'clear-search'])
   <ProductCatalog
     :products="products"
     :search-query="searchQuery"
+    :is-admin="isAdmin"
+    :loading="loading"
+    :load-error="loadError"
     :show-categories="false"
     :limit="4"
     title="Productos destacados"
@@ -86,15 +92,15 @@ const emit = defineEmits(['add-to-cart', 'clear-search'])
     <RouterLink class="secondary-button" to="/productos">Ver todos los productos →</RouterLink>
   </div>
 
-  <section id="nosotros" class="promo-banner section-shell">
+  <section class="promo-banner section-shell">
     <div class="promo-icon" aria-hidden="true">✦</div>
     <div>
       <span class="eyebrow">PUNTOZERO, CERCA TUYO</span>
       <h2>Encontrá eso que te conecta<span>.</span></h2>
       <p>Marcas que conocés, precios para aprovechar y atención que hace la diferencia.</p>
     </div>
-    <RouterLink class="primary-button" to="/productos">
-      Ver productos
+    <RouterLink class="primary-button" to="/nosotros">
+      Conocé PuntoZero
       <svg viewBox="0 0 20 20" aria-hidden="true">
         <path d="M3.5 10h12m-5-5 5 5-5 5" />
       </svg>

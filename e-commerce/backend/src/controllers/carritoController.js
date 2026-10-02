@@ -18,10 +18,17 @@ const carritoController = {
       const usuarioId = req.usuario.id;
       const { productoId, cantidad } = req.body;
 
-      if (!productoId || !cantidad) {
+      if (
+        !Number.isInteger(productoId) ||
+        productoId <= 0 ||
+        !Number.isInteger(cantidad) ||
+        cantidad <= 0
+      ) {
         return res
           .status(400)
-          .json({ error: "El producto y la cantidad son obligatorios" });
+          .json({
+            error: "El producto y una cantidad entera mayor que cero son obligatorios",
+          });
       }
 
       const itemAgregado = await carritoService.agregarItem(
@@ -44,10 +51,17 @@ const carritoController = {
       const usuarioId = req.usuario.id;
       const { productoId, cantidad } = req.body;
 
-      if (!productoId || !cantidad) {
+      if (
+        !Number.isInteger(productoId) ||
+        productoId <= 0 ||
+        !Number.isInteger(cantidad) ||
+        cantidad <= 0
+      ) {
         return res
           .status(400)
-          .json({ error: "El productoId y la cantidad son obligatorios" });
+          .json({
+            error: "El productoId y una cantidad entera mayor que cero son obligatorios",
+          });
       }
 
       const itemRestado = await carritoService.restarItem(

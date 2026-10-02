@@ -1,9 +1,19 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
-import products from './data/products'
+import { computed, ref, watch } from 'vue'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { apiRequest } from './services/api'
+import { getProducts, getProductOptions } from './services/catalog'
+import { accessToken, currentUser, isAdmin, logout } from './stores/auth'
 
 const searchQuery = ref('')
+const route = useRoute()
+const products = ref([])
+const catalogLoading = ref(true)
+const catalogLoadError = ref('')
+const productOptions = ref({ marcas: [], categorias: [] })
+const productSaving = ref(false)
+const productSaveError = ref('')
+const productSaveRevision = ref(0)
 const cartItems = ref([])
 const isCartOpen = ref(false)
 const isMobileMenuOpen = ref(false)
@@ -21,6 +31,72 @@ const remainingForFreeShipping = computed(() =>
   Math.max(freeShippingThreshold - cartTotal.value, 0),
 )
 
+watch(
+  () => route.name,
+  (name) => {
+    if (name === 'home' || name === 'products') loadCatalog()
+    if (name === 'products' && isAdmin.value) loadProductOptions()
+  },
+  { immediate: true },
+)
+
+watch(
+  accessToken,
+  (token) => {
+    if (token) synchronizeCart()
+    else cartItems.value = []
+  },
+  { immediate: true },
+)
+
+watch(isAdmin, (admin) => {
+  if (admin && route.name === 'products') loadProductOptions()
+  else productOptions.value = { marcas: [], categorias: [] }
+})
+const pageProps = computed(() => {
+  if (route.name === 'home') {
+    return {
+      products: products.value,
+      searchQuery: searchQuery.value,
+      isAdmin: isAdmin.value,
+      loading: catalogLoading.value,
+      loadError: catalogLoadError.value,
+    }
+  }
+  if (route.name === 'products') {
+    return {
+      products: products.value,
+      searchQuery: searchQuery.value,
+      isAdmin: isAdmin.value,
+      brands: productOptions.value.marcas,
+      categoryOptions: productOptions.value.categorias,
+      loading: catalogLoading.value,
+      loadError: catalogLoadError.value,
+      saving: productSaving.value,
+      saveError: productSaveError.value,
+      saveRevision: productSaveRevision.value,
+    }
+  }
+  return {}
+})
+const pageEvents = computed(() => {
+  if (route.name === 'home') {
+    return {
+      'add-to-cart': addToCart,
+      'clear-search': () => (searchQuery.value = ''),
+    }
+  }
+  if (route.name === 'products') {
+    return {
+      'add-to-cart': addToCart,
+      'clear-search': () => (searchQuery.value = ''),
+      'save-product': saveProduct,
+      'delete-product': deleteProduct,
+    }
+  }
+  return {}
+})
+
 const formatPrice = (price) =>
   new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -28,10 +104,34 @@ const formatPrice = (price) =>
     maximumFractionDigits: 0,
   }).format(price)
 
-function addToCart(product) {
+async function addToCart(product) {
+  if (product.stock <= 0) {
+    showNotice('Este producto no tiene stock disponible.')
+    return
+  }
+
+  if (accessToken.value) {
+    try {
+      await apiRequest('/carrito/agregar', {
+        method: 'POST',
+        body: JSON.stringify({ productoId: product.id, cantidad: 1 }),
+      })
+      await loadCart()
+      showNotice(`${product.name} se agregó al carrito`)
+    } catch (error) {
+      console.error('No se pudo agregar el producto al carrito:', error)
+      showNotice(error.message || 'No se pudo agregar el producto al carrito.')
+    }
+    return
+  }
+
   const existingProduct = cartItems.value.find((item) => item.id === product.id)
 
   if (existingProduct) {
+    if (existingProduct.quantity >= product.stock) {
+      showNotice('No hay stock suficiente para agregar otra unidad.')
+      return
+    }
     existingProduct.quantity += 1
   } else {
     cartItems.value.push({ ...product, quantity: 1 })
@@ -40,7 +140,21 @@ function addToCart(product) {
   showNotice(`${product.name} se agregó al carrito`)
 }
 
-function changeQuantity(productId, amount) {
+async function changeQuantity(productId, amount) {
+  if (accessToken.value) {
+    try {
+      await apiRequest(amount < 0 ? '/carrito/restar' : '/carrito/agregar', {
+        method: amount < 0 ? 'PUT' : 'POST',
+        body: JSON.stringify({ productoId: productId, cantidad: Math.abs(amount) }),
+      })
+      await loadCart()
+    } catch (error) {
+      console.error('No se pudo actualizar el carrito:', error)
+      showNotice(error.message || 'No se pudo actualizar el carrito.')
+    }
+    return
+  }
+
   const item = cartItems.value.find((product) => product.id === productId)
 
   if (!item) return
@@ -67,6 +181,109 @@ function startCheckout() {
 function closeMobileMenu() {
   isMobileMenuOpen.value = false
 }
+
+async function loadCatalog() {
+  try {
+    catalogLoading.value = true
+    catalogLoadError.value = ''
+    products.value = await getProducts()
+  } catch (error) {
+    console.error('No se pudo cargar el catálogo desde el backend:', error)
+    catalogLoadError.value = error.message || 'No se pudo conectar con el catálogo.'
+  } finally {
+    catalogLoading.value = false
+  }
+}
+
+async function loadProductOptions() {
+  try {
+    productOptions.value = await getProductOptions()
+    productSaveError.value = ''
+  } catch (error) {
+    console.error('No se pudieron cargar marcas y categorías:', error)
+    productSaveError.value = error.message
+  }
+}
+
+async function loadCart() {
+  try {
+    const cart = await apiRequest('/carrito')
+    if (!Array.isArray(cart.items)) {
+      throw new Error('El carrito recibido del servidor no tiene el formato esperado.')
+    }
+    cartItems.value = cart.items.map((item) => ({
+      id: Number(item.producto_id),
+      name: item.nombre,
+      brand: item.marca || '',
+      category: item.categoria || '',
+      price: Number(item.precio_unitario),
+      quantity: Number(item.cantidad),
+      image: item.imagen_url || '',
+      imageAlt: item.nombre,
+    }))
+  } catch (error) {
+    console.error('No se pudo cargar el carrito desde el backend:', error)
+    showNotice(error.message || 'No se pudo cargar el carrito.')
+  }
+}
+
+async function synchronizeCart() {
+  const guestItems = [...cartItems.value]
+  await loadCart()
+  if (!guestItems.length) return
+
+  try {
+    for (const item of guestItems) {
+      await apiRequest('/carrito/agregar', {
+        method: 'POST',
+        body: JSON.stringify({ productoId: item.id, cantidad: item.quantity }),
+      })
+    }
+    await loadCart()
+    showNotice('Tu carrito se sincronizó con tu cuenta.')
+  } catch (error) {
+    console.error('No se pudo sincronizar el carrito de invitado:', error)
+    showNotice(error.message || 'No se pudo sincronizar el carrito de invitado.')
+  }
+}
+
+async function saveProduct({ id, product }) {
+  if (!isAdmin.value) return
+  productSaving.value = true
+  productSaveError.value = ''
+  try {
+    await apiRequest(id ? `/productos/${id}` : '/productos', {
+      method: id ? 'PUT' : 'POST',
+      body: JSON.stringify(product),
+    })
+    await loadCatalog()
+    productSaveRevision.value += 1
+    showNotice(id ? 'Producto actualizado en la base de datos.' : 'Producto agregado al catálogo.')
+  } catch (error) {
+    console.error('No se pudo guardar el producto:', error)
+    productSaveError.value = error.message || 'No se pudo guardar el producto.'
+  } finally {
+    productSaving.value = false
+  }
+}
+
+async function deleteProduct(productId) {
+  if (!isAdmin.value) return
+  try {
+    await apiRequest(`/productos/${productId}`, { method: 'DELETE' })
+    await loadCatalog()
+    showNotice('Producto eliminado del catálogo.')
+  } catch (error) {
+    console.error('No se pudo eliminar el producto:', error)
+    showNotice(error.message || 'No se pudo eliminar el producto.')
+  }
+}
+
+function signOut() {
+  logout()
+  closeMobileMenu()
+  showNotice('Cerraste sesión.')
+}
 </script>
 
 <template>
@@ -89,8 +306,15 @@ function closeMobileMenu() {
     >
       <RouterLink to="/" @click="closeMobileMenu">Inicio</RouterLink>
       <RouterLink to="/productos" @click="closeMobileMenu">Productos</RouterLink>
-      <RouterLink to="/#nosotros" @click="closeMobileMenu">Nosotros</RouterLink>
-      <RouterLink to="/#contacto" @click="closeMobileMenu">Contacto</RouterLink>
+      <RouterLink to="/nosotros" @click="closeMobileMenu">Nosotros</RouterLink>
+      <RouterLink to="/contacto" @click="closeMobileMenu">Contacto</RouterLink>
+      <span v-if="currentUser" class="nav-role">
+        {{ isAdmin ? 'Administrador' : 'Usuario' }}
+      </span>
+      <RouterLink v-else to="/login" @click="closeMobileMenu">Ingresar</RouterLink>
+      <button v-if="currentUser" class="nav-logout" type="button" @click="signOut">
+        Salir
+      </button>
     </nav>
 
     <div class="header-actions">
@@ -132,20 +356,19 @@ function closeMobileMenu() {
     <RouterView v-slot="{ Component }">
       <component
         :is="Component"
-        :products="products"
-        :search-query="searchQuery"
-        @add-to-cart="addToCart"
-        @clear-search="searchQuery = ''"
+        v-bind="pageProps"
+        v-on="pageEvents"
       />
     </RouterView>
   </main>
 
-  <footer id="contacto" class="site-footer">
+  <footer class="site-footer">
     <RouterLink class="brand footer-brand" to="/" aria-label="PuntoZero, inicio">
       <span class="brand-mark" aria-hidden="true">P</span>
       <span>Punto<span class="brand-accent">Zero</span></span>
     </RouterLink>
     <p>Tecnología para todos los días.</p>
+    <RouterLink class="footer-contact-link" to="/contacto">Contactanos</RouterLink>
     <span class="footer-credit">© 2026 PuntoZero · Tu próxima experiencia empieza acá</span>
   </footer>
 
@@ -222,9 +445,9 @@ function closeMobileMenu() {
           <span class="empty-cart-icon" aria-hidden="true">⌑</span>
           <h3>Tu carrito está esperando</h3>
           <p>Agregá tus productos favoritos y los vas a encontrar acá.</p>
-          <button class="primary-button" type="button" @click="isCartOpen = false">
+          <RouterLink class="primary-button" to="/productos" @click="isCartOpen = false">
             Explorar productos
-          </button>
+          </RouterLink>
         </div>
       </aside>
     </div>

@@ -5,6 +5,7 @@ const router = express.Router();
 // Importación de los archivos de rutas individuales
 const usuarioRoute = require('./UsuarioRoute');
 const authRoute = require('./authRoute');
+const productoRoute = require('./productoRoute');
 
 //importamos el middlewares para proteger la ruta, es decir, solo se puede acceder a la misma si la petición tiene un token válido
 const autenticacionMiddleware = require('../middlewares/autenticacionMiddleware');
@@ -12,6 +13,7 @@ const autenticacionMiddleware = require('../middlewares/autenticacionMiddleware'
 
 //RUTAS PÚBLICAS
 router.use('/auth', authRoute);
+router.use('/productos', productoRoute);
 
 //RUTAS PRIVADAS: sólo se puede acceder si el usuario esta logueado. 
 

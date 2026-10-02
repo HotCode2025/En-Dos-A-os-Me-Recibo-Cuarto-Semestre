@@ -1,47 +1,42 @@
-# Estructura del Proyecto Backend
+# Estructura del backend
 
 ```text
 backend/
 ├── src/
-│   ├── config/             # Configuración global (Base de datos, variables de entorno)
-│   │   ├── db.js
-│   │   └── env.js
-│   ├── controllers/        # Manejan req, res y llamadas a servicios
-│   │   ├── authController.js
-│   │   ├── cartController.js
-│   │   └── productController.js
-│   ├── middlewares/        # Validaciones, JWT, manejo de errores
-│   │   ├── authMiddleware.js
-│   │   ├── errorMiddleware.js
-│   │   └── roleMiddleware.js
-│   ├── models/             # Consultas SQL o Esquemas de BD
-│   │   ├── Cart.js
-│   │   ├── Product.js
-│   │   └── User.js
-│   ├── routes/             # Definición de endpoints de la API
-│   │   ├── index.js        # Enrutador principal (/api/v1)
-│   │   ├── authRoutes.js
-│   │   ├── cartRoutes.js
-│   │   └── productRoutes.js
-│   ├── services/           # Lógica de negocio (Cálculos, llamadas a pagos, etc.)
-│   │   ├── cartService.js
-│   │   └── productService.js
-│   ├── utils/              # Funciones auxiliares (formateadores, helpers)
-│   │   └── jwt.js
-│   └── app.js              # Inicialización de Express y middlewares
-├── .env                    # Variables de entorno (DB_HOST, JWT_SECRET, PORT)
-├── index.js                # Punto de entrada para arrancar el servidor
+│   ├── config/       # PostgreSQL y verificación de esquema
+│   ├── controllers/  # Controladores HTTP
+│   ├── middlewares/  # Validación, autenticación y permisos por rol
+│   ├── models/       # Consultas SQL sobre las tablas de la base
+│   ├── routes/       # Endpoints de la API
+│   ├── services/     # Reglas de negocio
+│   └── utils/        # JWT y contraseñas
+├── index.js
 └── package.json
 ```
 
-## Descripción de Componentes
+## Catálogo y permisos
 
-- **`src/config/`**: Contiene la configuración global del proyecto, como conexiones a bases de datos y la lectura de variables de entorno.
-- **`src/controllers/`**: Recibe las solicitudes HTTP (`req`), interactúa con los servicios correspondientes y retorna las respuestas (`res`).
-- **`src/middlewares/`**: Funciones intermedias para autenticación JWT, control de roles de usuario y captura de errores globales.
-- **`src/models/`**: Define los modelos de datos, consultas SQL o esquemas (ej. Mongoose / Sequelize / Knex).
-- **`src/routes/`**: Define los endpoints de la API RESTful y los asocia con sus respectivos controladores y middlewares.
-- **`src/services/`**: Encapsula toda la lógica de negocio (reglas, integraciones externas, transacciones complejas).
-- **`src/utils/`**: Funciones auxiliares reutilizables, como la generación y verificación de tokens JWT o helpers de formato.
-- **`src/app.js`**: Configura la instancia principal de Express, registra middlewares globales y rutas.
-- **`index.js`**: Punto de entrada de la aplicación que inicia el servidor HTTP.
+El frontend consulta `GET /api/v1/productos`, que lee `producto` y relaciona
+`marca`, `categorias` y `valoracion`. Los precios, existencias, imagen,
+destacado y puntuación se obtienen de las columnas de `producto`; la cantidad
+de opiniones se calcula desde `valoracion`.
+
+Las operaciones para agregar, modificar o eliminar productos requieren un JWT
+con rol `ADMIN`:
+
+- `GET /api/v1/productos/opciones` devuelve marcas y categorías para los formularios.
+- `POST /api/v1/productos` crea un producto.
+- `PUT /api/v1/productos/:id` modifica un producto.
+- `DELETE /api/v1/productos/:id` elimina un producto si no está referenciado.
+
+El carrito autenticado usa `carrito` e `item_carrito`; el catálogo limita la
+compra al stock disponible. El login usa `usuario.email`, `usuario.password_hash`
+y `usuario.rol`. El registro público asigna `CLIENTE`; el alta de administradores
+se gestiona fuera del registro público.
+
+`src/config/initDb.js` verifica que las tablas y columnas coincidan con el ERD.
+No crea tablas ni altera la base existente. El backend espera una conexión
+PostgreSQL configurada en el entorno del backend.
+
+En desarrollo, Vite reenvía las solicitudes `/api` al backend local en el
+puerto `3000`.

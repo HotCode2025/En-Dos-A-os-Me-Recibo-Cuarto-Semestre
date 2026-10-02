@@ -19,6 +19,10 @@ const carritoService = {
   },
 
   agregarItem: async (usuarioId, productoId, cantidad) => {
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+      throw new Error("La cantidad debe ser un entero mayor que cero");
+    }
+
     const carritoId = await carritoModel.obtenerCarritoPorUsuario(usuarioId);
 
     const producto = await carritoModel.obtenerProductoPorId(productoId);
@@ -30,6 +34,11 @@ const carritoService = {
       carritoId,
       productoId,
     );
+
+    const cantidadActual = itemExistente ? itemExistente.cantidad : 0;
+    if (cantidadActual + cantidad > producto.stock) {
+      throw new Error("No hay stock suficiente para esa cantidad");
+    }
 
     if (itemExistente) {
       const nuevaCantidad = itemExistente.cantidad + cantidad;
