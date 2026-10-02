@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>San Rafael Movilidad - Inicio</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+</head>
+
+<body>
+
+    <!-- Encabezado / Barra de Navegación Global -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🚌</span>
+                <h1>San Rafael <span>Movilidad</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="active" aria-current="page">Inicio</a></li>
+                    <li><a href="/pages/recorrido.html">Recorridos</a></li>
+                    <li><a href="/pages/turismo.html">Puntos Turísticos</a></li>
+                    <li><a href="pages/feedback.html">Feedback</a></li>
+                    <li><a href="/pages/login.html" class="btn-login">Mi Cuenta</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Sección Principal: Buscador y Mapa -->
+    <main class="hero-section">
+        <div class="hero-container">
+
+            <!-- Panel de Búsqueda -->
+            <section class="search-panel">
+                <span class="eyebrow">MOVILIDAD URBANA · SAN RAFAEL</span>
+                <h2>¿Hacia dónde vas hoy?</h2>
+                <p>Indica desde dónde sales y a dónde quieres ir para ver una ruta vial en el mapa.</p>
+
+                <form class="search-form">
+                    <div class="form-group">
+                        <label for="origen">Origen</label>
+                        <input type="text" id="origen" placeholder="Ej: Terminal de Ómnibus" autocomplete="street-address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destino">Destino</label>
+                        <input type="text" id="destino" placeholder="Ej: Plaza San Martín" autocomplete="street-address" required>
+                    </div>
+                    <div class="schedule-shortcut">
+                        <span class="schedule-shortcut-icon" aria-hidden="true">🚌</span>
+                        <div>
+                            <strong>¿Buscas los horarios del colectivo?</strong>
+                            <a href="/pages/recorrido.html">Consulta recorridos y horarios de la línea 511 <span aria-hidden="true">→</span></a>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-search">
+                        <span>Buscar recorrido</span>
+                        <span class="button-arrow" aria-hidden="true">→</span>
+                    </button>
+                </form>
+                <p class="route-feedback" id="route-feedback" role="status" aria-live="polite"></p>
+            </section>
+
+            <!-- Mapa de San Rafael -->
+            <section class="map-wrapper">
+                <div class="map-heading">
+                    <div>
+                        <span class="map-kicker">EXPLORÁ LA CIUDAD</span>
+                        <h2>San Rafael, Mendoza</h2>
+                    </div>
+                    <span class="map-status"><span aria-hidden="true"></span> Mapa interactivo</span>
+                </div>
+                <div class="map-container-real">
+                    <div id="map" role="application" aria-label="Mapa interactivo de San Rafael y la ruta"></div>
+                </div>
+                <p class="route-note">La ruta es vial y orientativa; no representa el recorrido de una línea de colectivo.</p>
+            </section>
+
+
+
+
+        </div>
+    </main>
+
+    <!-- Sección de Accesos Rápidos -->
+    <section class="quick-links">
+        <div class="container">
+            <h3>Accesos Rápidos</h3>
+            <div class="grid-links">
+                <a href="pages/recorrido.html" class="card-link">
+                    <span class="card-icon">⏰</span>
+                    <h4>Horarios Frecuentes</h4>
+                    <p>Consulta las paradas y horarios oficiales de la línea 511.</p>
+                </a>
+                <a href="pages/turismo.html" class="card-link">
+                    <span class="card-icon">⛰️</span>
+                    <h4>Rutas Turísticas</h4>
+                    <p>Cómo llegar a Valle Grande, El Nihuil o bodegas locales.</p>
+                </a>
+                <a href="pages/feedback.html" class="card-link">
+                    <span class="card-icon">💬</span>
+                    <h4>Reportar Incidencia</h4>
+                    <p>¿Hubo demoras o cambios de parada? Infórmanos aquí.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de Página Global -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 San Rafael Movilidad. Proyecto de Asistencia al Transporte Público.</p>
+            <ul class="footer-links">
+                <li><a href="#">Términos de uso</a></li>
+                <li><a href="#">Ayuda</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    const form = document.querySelector(".search-form");
+    const searchButton = form.querySelector(".btn-search");
+    const buttonLabel = searchButton.querySelector("span");
+    const feedback = document.querySelector("#route-feedback");
+    const map = L.map("map").setView([-34.6175, -68.3301], 14);
+    const routeLayers = L.featureGroup().addTo(map);
+    let activeSearch;
+    let lastGeocodeRequest = 0;
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    function wait(milliseconds, signal) {
+        if (milliseconds <= 0) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const onAbort = () => {
+                clearTimeout(timer);
+                reject(new DOMException("Búsqueda cancelada", "AbortError"));
+            };
+            const timer = setTimeout(() => {
+                signal.removeEventListener("abort", onAbort);
+                resolve();
+            }, milliseconds);
+            signal.addEventListener("abort", onAbort, { once: true });
+        });
+    }
+
+    async function geocode(place, signal) {
+        await wait(1100 - (Date.now() - lastGeocodeRequest), signal);
+        const query = new URLSearchParams({
+            format: "jsonv2",
+            limit: "1",
+            countrycodes: "ar",
+            viewbox: "-68.42,-34.52,-68.22,-34.72",
+            q: `${place}, San Rafael, Mendoza, Argentina`
+        });
+        lastGeocodeRequest = Date.now();
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?${query}`, {
+            headers: { Accept: "application/json" },
+            signal
+        });
+        if (!response.ok) {
+            throw new Error("No se pudo buscar la dirección. Intenta nuevamente en unos segundos.");
+        }
+
+        const results = await response.json();
+        if (!Array.isArray(results) || !results.length) {
+            throw new Error(`No encontramos “${place}” en San Rafael. Prueba con una dirección o punto de referencia cercano.`);
+        }
+
+        const latitude = Number(results[0].lat);
+        const longitude = Number(results[0].lon);
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            throw new Error(`No pudimos interpretar la ubicación de “${place}”.`);
+        }
+
+        return { latitude, longitude, name: results[0].name || place };
+    }
+
+    function addPlaceMarker(place, label, color) {
+        const icon = L.divIcon({
+            className: "",
+            html: `<span class="route-marker route-marker-${color}"></span>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+        const marker = L.marker([place.latitude, place.longitude], {
+            title: `${label}: ${place.name}`,
+            icon
+        });
+        const popup = document.createElement("strong");
+        popup.textContent = `${label}: ${place.name}`;
+        marker.bindPopup(popup);
+        routeLayers.addLayer(marker);
+    }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const originText = document.querySelector("#origen").value.trim();
+        const destinationText = document.querySelector("#destino").value.trim();
+        if (!originText || !destinationText) {
+            feedback.textContent = "Completa el origen y el destino para buscar una ruta.";
+            feedback.classList.add("is-error");
+            return;
+        }
+
+        activeSearch?.abort();
+        activeSearch = new AbortController();
+        const { signal } = activeSearch;
+        searchButton.disabled = true;
+        buttonLabel.textContent = "Buscando...";
+        routeLayers.clearLayers();
+        map.setView([-34.6175, -68.3301], 14);
+        feedback.classList.remove("is-error");
+        feedback.textContent = "Buscando las ubicaciones y calculando la ruta...";
+
+        try {
+            const origin = await geocode(originText, signal);
+            const destination = await geocode(destinationText, signal);
+            const coordinates = `${origin.longitude},${origin.latitude};${destination.longitude},${destination.latitude}`;
+            const routeResponse = await fetch(
+                `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`,
+                { headers: { Accept: "application/json" }, signal }
+            );
+            if (!routeResponse.ok) {
+                throw new Error("No se pudo calcular el recorrido. Intenta nuevamente más tarde.");
+            }
+
+            const routeData = await routeResponse.json();
+            const route = routeData.routes?.[0];
+            const routeCoordinates = route?.geometry?.coordinates;
+            if (routeData.code !== "Ok" || !Array.isArray(routeCoordinates) || routeCoordinates.length < 2) {
+                throw new Error("No encontramos una ruta vial entre esos puntos.");
+            }
+            if (!Number.isFinite(route.distance) || !Number.isFinite(route.duration)) {
+                throw new Error("El servicio devolvió una ruta sin distancia o duración válidas.");
+            }
+
+            routeLayers.clearLayers();
+            addPlaceMarker(origin, "Origen", "start");
+            addPlaceMarker(destination, "Destino", "end");
+            const routeLine = L.polyline(
+                routeCoordinates.map(([longitude, latitude]) => [latitude, longitude]),
+                { color: "#168b72", weight: 6, opacity: 0.9, lineCap: "round", lineJoin: "round" }
+            ).addTo(routeLayers);
+            map.fitBounds(routeLine.getBounds().pad(0.18), { maxZoom: 16 });
+
+            const distanceKm = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 })
+                .format(route.distance / 1000);
+            const durationMinutes = Math.max(1, Math.round(route.duration / 60));
+            feedback.textContent = `Ruta aproximada: ${distanceKm} km · ${durationMinutes} min en auto.`;
+        } catch (error) {
+            if (error.name !== "AbortError") {
+                feedback.textContent = error.message || "Ocurrió un error al buscar la ruta. Intenta nuevamente.";
+                feedback.classList.add("is-error");
+            }
+        } finally {
+            if (activeSearch?.signal === signal) {
+                activeSearch = null;
+                searchButton.disabled = false;
+                buttonLabel.textContent = "Buscar recorrido";
+            }
+        }
+    });
+
+    window.addEventListener("load", () => map.invalidateSize());
+</script>
+
+</body>
+</html>

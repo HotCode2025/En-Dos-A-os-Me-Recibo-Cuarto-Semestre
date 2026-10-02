@@ -1,0 +1,202 @@
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS: PÁGINA FEEDBACK Y REPORTES
+   ========================================================================== */
+.feedback-section {
+    padding: 40px 20px;
+}
+
+.feedback-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+}
+
+.feedback-intro h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.feedback-intro p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+/* Grilla del Feedback */
+.feedback-grid {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.feedback-form-wrapper {
+    flex: 1.2;
+    min-width: 320px;
+    background-color: var(--white);
+    border: 1px solid #e5e7eb;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.feedback-form-wrapper h3,
+.feedback-feed-wrapper h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.feedback-form .form-group {
+    margin-bottom: 20px;
+}
+
+.feedback-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.feedback-form input,
+.feedback-form select,
+.feedback-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+}
+
+.feedback-form input:focus,
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Selector de Estrellas Invertido (Pura simulación CSS visual) */
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 4px;
+    font-size: 1.8rem;
+}
+
+.rating-stars input {
+    display: none;
+}
+
+.rating-stars label {
+    color: #d1d5db;
+    cursor: pointer;
+    margin-bottom: 0;
+    transition: color 0.2s;
+}
+
+.rating-stars label:hover,
+.rating-stars label:hover ~ label,
+.rating-stars input:checked ~ label {
+    color: #fbbf24; /* Dorado para estrellas seleccionadas */
+}
+
+/* Botón del Formulario */
+.btn-submit-feedback {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-submit-feedback:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Feed Lateral de la Comunidad */
+.feedback-feed-wrapper {
+    flex: 0.8;
+    min-width: 300px;
+}
+
+.feed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feed-empty {
+    padding: 22px;
+    border: 1px dashed #cbd8e0;
+    border-radius: 8px;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.feed-card {
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+}
+
+/* Variaciones de color según el reporte */
+.feed-card.alert-delay {
+    border-left: 4px solid #ef4444; /* Rojo para demoras */
+}
+
+.feed-card.alert-success {
+    border-left: 4px solid var(--accent-color); /* Verde para éxitos/felicitaciones */
+}
+
+.feed-card-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.feed-date {
+    color: var(--text-light);
+}
+
+.feed-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.feed-badge-line {
+    background-color: var(--bg-light);
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.feed-stars {
+    color: #fbbf24;
+    font-size: 0.9rem;
+}
+
+.feed-text {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .feedback-grid {
+        flex-direction: column;
+    }
+}

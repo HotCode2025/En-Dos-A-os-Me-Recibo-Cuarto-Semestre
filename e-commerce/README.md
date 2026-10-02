@@ -1,6 +1,6 @@
 # E-commerce
 
-Proyecto de concesionaria online con un backend en Node.js y Express y un frontend en Vue 3 + Vite. El frontend presenta autos de muestra de marcas disponibles en el mercado argentino, permite filtrar por marca y guardar vehículos en una lista de reservas.
+Proyecto de tienda online de productos electrónicos con un backend en Node.js y Express y un frontend en Vue 3 + Vite. El frontend presenta la tienda PuntoZero con un catálogo de 20 productos de muestra, búsqueda, filtros por categoría, carrito de compras y diseño adaptable a móviles.
 
 ## Requisitos
 
@@ -62,11 +62,12 @@ Para detener cualquiera de los servidores, usá `Ctrl+C` en su terminal.
 
 - `http://localhost:3000/` muestra un mensaje de que Express está funcionando.
 - `http://localhost:3000/test-db` prueba la conexión con PostgreSQL. Requiere que `backend/.env` tenga una `DATABASE_URL` válida.
-- `http://localhost:5173` muestra la tienda.
+- `http://localhost:5173` muestra la página de inicio.
+- `http://localhost:5173/productos` muestra el catálogo completo.
 
-## Estado actual del catálogo y las reservas
+## Estado actual del catálogo y el carrito
 
-El frontend incluye autos de muestra, búsqueda por marca/modelo/año, filtros por marca y una lista local de reservas. Las reservas son una demostración: no se envía una solicitud real, no se confirma disponibilidad ni se procesa ningún pago. Los precios, kilómetros y demás datos mostrados son orientativos y deben confirmarse con la concesionaria. El catálogo y las reservas todavía no están conectados al backend ni se guardan en la base de datos.
+El frontend incluye 20 productos de muestra, búsqueda por nombre/marca/categoría, filtros por categoría y un carrito compartido entre páginas con cantidades y cálculo de subtotal. Es una demostración: el catálogo y el carrito todavía no están conectados al backend, no se confirma disponibilidad ni se procesa ningún pago. Los precios y las promociones son ilustrativos.
 
 
 ## Estructura

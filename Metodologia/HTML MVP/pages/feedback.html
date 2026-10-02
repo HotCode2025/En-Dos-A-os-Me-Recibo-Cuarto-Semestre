@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>San Rafael Movilidad - Feedback</title>
+     <link rel="stylesheet" href="/css/style.css">
+     <link rel="stylesheet" href="/css/feedback.css">
+</head>
+<body>
+
+    <!-- Encabezado / Barra de Navegación Global -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🚌</span>
+                <h1>San Rafael <span>Movilidad</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="active">Inicio</a></li>
+                    <li><a href="recorrido.html">Recorridos</a></li>
+                    <li><a href="turismo.html">Puntos Turísticos</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
+                    <li><a href="login.html" class="btn-login">Mi Cuenta</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal de Feedback -->
+    <main class="container feedback-section">
+        
+        <div class="feedback-intro">
+            <h2>Tu opinión nos ayuda a mejorar</h2>
+            <p>¿Tuviste algún problema con una línea? ¿Querés sugerir una mejora o reportar una demora? Envianos tu reseña sobre el transporte público de San Rafael.</p>
+        </div>
+
+        <div class="feedback-grid">
+            
+            <!-- Columna Izquierda: Formulario de Reporte -->
+            <section class="feedback-form-wrapper">
+                <h3>📋 Enviar Reporte u Opinión</h3>
+                
+                <form class="feedback-form">
+                    <div class="form-group">
+                        <label for="feedback-linea">Línea de Colectivo asociada</label>
+                        <select id="feedback-linea" required>
+                            <option value="">Selecciona la línea...</option>
+                            <option value="511">Línea 511 - Iselín (cuadro 511E cargado)</option>
+                            <option value="general">Opinión General del Sistema</option>
+                        </select>
+                    </div>
+
+                    <!-- Sistema de Estrellas Simulado -->
+                    <div class="form-group">
+                        <label>Calificación del servicio</label>
+                        <div class="rating-stars">
+                            <input type="radio" name="stars" id="star-5" value="5"><label for="star-5">★</label>
+                            <input type="radio" name="stars" id="star-4" value="4"><label for="star-4">★</label>
+                            <input type="radio" name="stars" id="star-3" value="3"><label for="star-3">★</label>
+                            <input type="radio" name="stars" id="star-2" value="2"><label for="star-2">★</label>
+                            <input type="radio" name="stars" id="star-1" value="1"><label for="star-1">★</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feedback-tipo">Tipo de reporte</label>
+                        <select id="feedback-tipo" required>
+                            <option value="sugerencia">Sugerencia</option>
+                            <option value="demora">Reportar Demora / Colectivo no pasó</option>
+                            <option value="parada">Problema con una Parada</option>
+                            <option value="felicitacion">Felicitación</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feedback-mensaje">Tu comentario o descripción detallada</label>
+                        <textarea id="feedback-mensaje" rows="6" placeholder="Escribí detalladamente lo sucedido (mencioná horarios o calles si es necesario)..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit-feedback">Enviar Comentario</button>
+                </form>
+            </section>
+
+            <!-- Columna Derecha: Reportes Recientes de Comunidad -->
+            <section class="feedback-feed-wrapper">
+                <h3>📢 Reportes de la Comunidad</h3>
+                <p class="section-subtitle">Los reportes publicados por la comunidad aparecerán aquí.</p>
+                
+                <div class="feed-container">
+                    <p class="feed-empty">Todavía no hay reportes publicados.</p>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Pie de Página Global -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 San Rafael Movilidad. Proyecto de Asistencia al Transporte Público.</p>
+            <ul class="footer-links">
+                <li><a href="#">Términos de uso</a></li>
+                <li><a href="#">Ayuda</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
+
+</body>
+</html>

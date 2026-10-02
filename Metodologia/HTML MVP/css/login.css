@@ -1,0 +1,149 @@
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS: PÁGINA DE LOGIN Y REGISTRO
+   ========================================================================== */
+.login-bg {
+    background-color: var(--bg-light);
+    min-height: calc(100vh - 170px); /* Ajusta el tamaño restando header y footer */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.login-container {
+    background-color: var(--white);
+    width: 100%;
+    max-width: 450px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* Pestañas superiores */
+.login-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+    background-color: #f3f4f6;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    background-color: var(--white);
+    border-bottom: 3px solid var(--secondary-color);
+}
+
+/* Estructura interna del formulario */
+.login-form {
+    padding: 30px;
+}
+
+.login-form .form-group {
+    margin-bottom: 20px;
+}
+
+.login-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.login-form input:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Enlace de recuperación */
+.label-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-link {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Checkbox recordar sesión */
+.form-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.form-remember input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.form-remember label {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Botón de envío */
+.btn-login-submit {
+    width: 100%;
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-login-submit:hover {
+    background-color: #2563eb;
+}
+
+/* Sección informativa inferior */
+.login-footer-help {
+    background-color: #f9fafb;
+    padding: 20px 30px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.4;
+}

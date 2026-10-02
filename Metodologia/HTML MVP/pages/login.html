@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>San Rafael Movilidad - Acceso</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/login.css">
+
+</head>
+
+<body>
+
+    <!-- Encabezado / Barra de Navegación Global -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🚌</span>
+                <h1>San Rafael <span>Movilidad</span></h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="active">Inicio</a></li>
+                    <li><a href="recorrido.html">Recorridos</a></li>
+                    <li><a href="turismo.html">Puntos Turísticos</a></li>
+                    <li><a href="feedback.html">Feedback</a></li>
+                    <li><a href="login.html" class="btn-login">Mi Cuenta</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenedor del Formulario de Acceso -->
+    <main class="login-bg">
+        <div class="login-container">
+
+            <!-- Selectores de pestaña simulados -->
+            <div class="login-tabs">
+                <button class="tab-btn active" id="tab-login">Iniciar Sesión</button>
+                <button class="tab-btn" id="tab-register">Crear Cuenta</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="login-email">Correo Electrónico</label>
+                    <input type="email" id="login-email" placeholder="ejemplo@correo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <div class="label-wrapper">
+                        <label for="login-pass">Contraseña</label>
+                        <a href="#" class="forgot-link">¿La olvidaste?</a>
+                    </div>
+                    <input type="password" id="login-pass" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-remember">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">Recordar mi sesión en este dispositivo</label>
+                </div>
+
+                <button type="submit" class="btn-login-submit">Ingresar al Panel</button>
+            </form>
+
+            <!-- Mensaje de ayuda al pie del formulario -->
+            <div class="login-footer-help">
+                <p>Al iniciar sesión podés guardar tus recorridos favoritos y realizar reportes firmados en el sistema
+                    de feedback.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Pie de Página Global -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 San Rafael Movilidad. Proyecto de Asistencia al Transporte Público.</p>
+            <ul class="footer-links">
+                <li><a href="#">Términos de uso</a></li>
+                <li><a href="#">Ayuda</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
+
+</body>
+
+</html>

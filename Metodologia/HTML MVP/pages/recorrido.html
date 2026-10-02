@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Horarios y paradas de los recorridos de la línea 511 de Autotransportes Iselín S.A.">
+    <title>Línea 511 · Horarios y recorridos | San Rafael Movilidad</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../css/recorrido.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <a class="logo" href="/" aria-label="San Rafael Movilidad, inicio">
+                <span class="logo-icon" aria-hidden="true">🚌</span>
+                <h1>San Rafael <span>Movilidad</span></h1>
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="/pages/recorrido.html" class="active" aria-current="page">Recorridos</a></li>
+                    <li><a href="/pages/turismo.html">Puntos Turísticos</a></li>
+                    <li><a href="/pages/feedback.html">Feedback</a></li>
+                    <li><a href="/pages/login.html" class="btn-login">Mi Cuenta</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="schedule-section">
+        <a class="back-link" href="/">← Volver al inicio</a>
+        <section class="route-header" aria-labelledby="page-title">
+            <span class="route-badge" id="line-badge">Línea 511</span>
+            <span class="route-kicker">HORARIOS OFICIALES · SAN RAFAEL</span>
+            <h2 id="page-title">Recorridos y horarios</h2>
+            <p class="route-company">Empresa prestadora: <strong>Autotransportes Iselín S.A.</strong></p>
+            <p class="route-description">Consulta los horarios oficiales y la secuencia de paradas por recorrido y día de servicio.</p>
+        </section>
+
+        <section class="route-controls" id="route-controls" aria-label="Seleccionar línea, día y recorrido">
+            <div class="control-field">
+                <label for="line-select">Línea</label>
+                <select id="line-select">
+                    <option value="511" selected>Línea 511</option>
+                    <option value="512">Línea 512</option>
+                    <option value="513">Línea 513</option>
+                </select>
+            </div>
+            <div class="control-field">
+                <label for="day-select">Día de servicio</label>
+                <select id="day-select">
+                    <option value="" selected disabled>Seleccioná un día de servicio</option>
+                    <option value="lv">Lunes a viernes</option>
+                    <option value="s">Sábados</option>
+                    <option value="d">Domingos y feriados</option>
+                </select>
+            </div>
+            <div class="control-field" id="route-field" hidden>
+                <label for="route-select">Recorrido disponible</label>
+                <select id="route-select" disabled>
+                    <option value="" selected disabled>Primero elegí un día</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="schedule-card" id="schedule-card" aria-labelledby="schedule-title" hidden>
+            <div class="schedule-heading">
+                <div>
+                    <span class="schedule-kicker">511E · LUNES A VIERNES</span>
+                    <h2 id="schedule-title">Izuel - Doña Paula - Cuadro Nacional x Salas</h2>
+                </div>
+                <span class="data-badge" id="schedule-badge"><span aria-hidden="true"></span> Cuadro recibido</span>
+            </div>
+
+            <div class="no-frequencies" id="no-frequencies" role="status" aria-live="polite" hidden>
+                <span class="no-frequencies-icon" aria-hidden="true">🕒</span>
+                <strong>No hay frecuencias para este día y horario.</strong>
+                <p>Selecciona otro día o recorrido para consultar sus horarios.</p>
+            </div>
+
+            <div id="schedule-details">
+            <div class="schedule-summary" aria-label="Resumen de salidas">
+                <div class="summary-item">
+                    <span class="summary-value" id="departure-count">16</span>
+                    <span class="summary-label">salidas informadas</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value" id="first-departure">07:30</span>
+                    <span class="summary-label">primera salida</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value" id="last-departure">20:30</span>
+                    <span class="summary-label">última salida</span>
+                </div>
+            </div>
+
+            <div class="departure-picker">
+                <label for="departure-select">Ver horario de una salida</label>
+                <select id="departure-select"></select>
+            </div>
+
+            <div class="stops-heading">
+                <div>
+                    <h3>Paradas y horarios</h3>
+                    <p id="selected-trip-label">Secuencia completa del recorrido para la salida seleccionada.</p>
+                </div>
+                <span class="stop-count" id="stop-count">19 paradas</span>
+            </div>
+            <ol class="timeline" id="stop-timeline" aria-live="polite"></ol>
+
+            <p class="schedule-notice" id="schedule-notice">Los horarios de sábados están cargados. Los cuadros de domingos y feriados se agregarán cuando los recibamos.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 San Rafael Movilidad. Proyecto de Asistencia al Transporte Público.</p>
+            <ul class="footer-links">
+                <li><a href="#">Términos de uso</a></li>
+                <li><a href="#">Ayuda</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="../js/recorrido-511.js"></script>
+</body>
+
+</html>
