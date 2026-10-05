@@ -67,7 +67,6 @@ const ordenModel = {
       SELECT o.*, m.nombre as metodo_pago_nombre, d.calle_numero, d.ciudad 
       FROM orden o
       LEFT JOIN metodo_pago m ON o.id_metodo_pago = m.id
-      LEFT JOIN direccion d ON o.id_direccion_envio = d.id
       WHERE o.id_usuario = $1
       ORDER BY o.fecha_pedido DESC
     `;
