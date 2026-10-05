@@ -32,45 +32,11 @@
     <!-- Primera fase del flujo: Selección de avatar por parte del usuario -->
     <section id="seleccionar-personaje">
         <h2>Elige tu Personaje</h2>
-        <div class="personajes">
-            <div class="personaje">
-                <img src="./media/zuko.png" alt="Zuko">
-                <label for="zuko">Zuko</label>
-                <input type="radio" name="personaje" id="zuko" value="Zuko">
-            </div>
-            <div class="personaje">
-                <img src="./media/katara.png" alt="Katara">
-                <label for="katara">Katara</label>
-                <input type="radio" name="personaje" id="katara" value="Katara">
-            </div>
-            <div class="personaje">
-                <img src="./media/aang.png" alt="Aang">
-                <label for="aang">Aang</label>
-                <input type="radio" name="personaje" id="aang" value="Aang">
-            </div>
-            <div class="personaje">
-                <img src="./media/toph.png" alt="Toph">
-                <label for="toph">Toph</label>
-                <input type="radio" name="personaje" id="toph" value="Toph">
-            </div>
-            <!--NUEVOS PERSONAJES DEL CATALOGO-->  
-            <div class="personaje">
-                <img src="./media/sokka.png" alt="Sokka">
-                <label for="sokka">Sokka</label>
-                <input type="radio" name="personaje" id="sokka" value="Sokka">
-           </div>
-            <div class="personaje">
-                <img src="./media/azula.jpg" alt="Azula">
-                <label for="azula">Azula</label>
-                 <input type="radio" name="personaje" id="azula" value="Azula">
-           </div>
-            <div class="personaje"> <!--Nuevo personaje-->
-                <img src="./media/suki.jpg" alt="Suki">
-                <label for="suki">Suki</label>
-                 <input type="radio" name="personaje" id="suki" value="Suki">
-           </div>
-
-        </div>
+        <!-- Ya no hay tarjetas escritas a mano: este contenedor arranca
+             vacío y JavaScript lo llena dinámicamente recorriendo el
+             array "avatares" con forEach. Agregar un personaje nuevo
+             ya NO requiere tocar este archivo. -->
+        <div class="personajes" id="contenedorTarjetas"></div>
         <button id="boton-personaje">Seleccionar</button>
     </section>
 

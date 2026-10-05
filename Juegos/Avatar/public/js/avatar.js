@@ -45,16 +45,15 @@ const katara = new Personaje('Katara', './media/katara.png');
 const aang = new Personaje('Aang', './media/aang.png');
 const toph = new Personaje('Toph', './media/toph.png');
 const sokka = new Personaje('Sokka', './media/sokka.png'); // PERSONAJE CREADO
-const azula = new Personaje('Azula', './media/azula.png'); // PERSONAJE CREADO
-const suki = new Personaje('Suki', './media/suki.jpg'); // Nuevo personaje 
-
+const azula = new Personaje('Azula', './media/azula.jpg'); // PERSONAJE CREADO 
+const suki = new Personaje('Suki', './media/suki.jpg'); // Nuevo personaje
 
 // === ARREGLO CON TODOS LOS PERSONAJES DISPONIBLES ===
 // Se crea vacío y se va llenando con .push(): si mañana agregás un
 // personaje nuevo, solo hace falta crearlo arriba (con "new") y
 // agregarlo acá con push — el resto del juego no se toca.
 const avatares = [];
-avatares.push(zuko, katara, aang, toph, sokka, azula,suki);
+avatares.push(zuko, katara, aang, toph, sokka, azula, suki);
 
 // === VARIABLES Y CONSTANTES ===
 // Estas SÍ cambian durante la partida: van a apuntar a los objetos
@@ -81,14 +80,44 @@ const seccionSeleccionarPersonaje = document.getElementById('seleccionar-persona
 const seccionSeleccionarAtaque = document.getElementById('seleccionar-ataque');
 const seccionReiniciar = document.getElementById('reiniciar');
 
+// Este SÍ se puede capturar acá arriba, junto a los demás: el <div>
+// vacío "contenedorTarjetas" ya existe en el HTML desde que carga la
+// página. Lo que NO existe todavía son los inputs de cada personaje:
+// esos los vamos a crear nosotros mismos más abajo, con forEach.
+const contenedorTarjetas = document.getElementById('contenedorTarjetas');
+
 // Aplicando el principio DRY (Don't Repeat Yourself):
 // Mapeo de cada tipo de ataque a su emoji, reutilizado en toda la app.
 const EMOJIS_ATAQUE = { punio: '👊', patada: '🦵', barrida: '👣' };
 
+// === RENDERIZADO DINÁMICO DE LAS TARJETAS DE PERSONAJES ===
+// Recorre el array "avatares" (un elemento por vuelta, en orden) y arma
+// el HTML de cada tarjeta con un template literal (backticks). Por cada
+// avatar, concatena (+=) su tarjeta dentro de "contenedorTarjetas".
+// Esto reemplaza lo que antes escribías a mano en el HTML: agregar un
+// personaje nuevo ya no requiere tocar ningún archivo HTML.
+function renderizarTarjetasPersonajes() {
+    avatares.forEach((avatar) => {
+        const tarjetaHTML = `
+            <div class="personaje">
+                <img src="${avatar.imagen}" alt="${avatar.nombre}">
+                <label for="${avatar.nombre}">${avatar.nombre}</label>
+                <input type="radio" name="personaje" id="${avatar.nombre}" value="${avatar.nombre}">
+            </div>
+        `;
+        contenedorTarjetas.innerHTML += tarjetaHTML;
+    });
+}
+
 // === FUNCIÓN INICIAL ===
-// Ya no busca elementos del DOM (eso se hizo arriba); solo define el
-// estado inicial de la interfaz y asigna los eventos.
 function iniciarJuego() {
+    // Primero generamos las tarjetas dinámicamente. Tiene que pasar ANTES
+    // de que cualquier otra parte del código intente buscar los inputs
+    // de personaje — si alguien los buscara arriba, junto a los demás
+    // "const" globales, estarían vacíos porque todavía no se crearon
+    // (ese es justamente el bug de "declaración lenta" que vimos).
+    renderizarTarjetasPersonajes();
+
     // Estado inicial de la interfaz
     seccionSeleccionarAtaque.style.display = 'none';
     seccionReiniciar.style.display = 'none';
@@ -103,6 +132,11 @@ function iniciarJuego() {
 
 // === SELECCIÓN DE PERSONAJES ===
 function seleccionarPersonajeJugador() {
+    // Importante: estos inputs se buscan ACÁ DENTRO, cada vez que se
+    // ejecuta la función (es decir, cuando el usuario hace click en
+    // "Seleccionar") — nunca arriba, junto a los const globales. Para
+    // ese momento, renderizarTarjetasPersonajes() ya se ejecutó y los
+    // inputs ya existen en el DOM.
     const inputs = document.querySelectorAll('input[name="personaje"]');
     let nombreElegido = null;
     // Recorre los inputs para encontrar cuál fue seleccionado
