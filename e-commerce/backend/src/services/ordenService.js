@@ -2,7 +2,7 @@ const ordenModel = require("../models/ordenModel");
 const carritoModel = require("../models/carritoModel");
 
 const ordenService = {
-  crearOrdenDesdeCarrito: async (usuarioId, direccionId, metodoPagoId) => {
+  crearOrdenDesdeCarrito: async (usuarioId, metodoPagoId) => {
     const carritoId = await carritoModel.obtenerCarritoPorUsuario(usuarioId);
     const items = await carritoModel.obtenerItemsCarrito(carritoId);
 
@@ -17,7 +17,6 @@ const ordenService = {
 
     const nuevaOrden = await ordenModel.crearOrdenTransaccional(
       usuarioId,
-      direccionId,
       metodoPagoId,
       items,
       total,

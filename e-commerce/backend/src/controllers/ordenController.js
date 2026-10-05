@@ -4,17 +4,16 @@ const ordenController = {
   crearOrden: async (req, res) => {
     try {
       const usuarioId = req.usuario.id; // Extraído del token JWT
-      const { direccionId, metodoPagoId } = req.body;
+      const { metodoPagoId } = req.body;
 
-      if (!direccionId || !metodoPagoId) {
+      if ( !metodoPagoId) {
         return res.status(400).json({
-          error: "Faltan datos obligatorios: direccionId y metodoPagoId",
+          error: "Faltan datos obligatorio: metodoPagoId",
         });
       }
 
       const resultado = await ordenService.crearOrdenDesdeCarrito(
         usuarioId,
-        direccionId,
         metodoPagoId,
       );
       return res.status(201).json(resultado);

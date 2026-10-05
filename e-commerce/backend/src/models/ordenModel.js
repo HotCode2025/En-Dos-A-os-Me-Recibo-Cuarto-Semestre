@@ -3,7 +3,6 @@ const pool = require("../config/db");
 const ordenModel = {
   crearOrdenTransaccional: async (
     usuarioId,
-    direccionId,
     metodoPagoId,
     itemsCarrito,
     total,
@@ -14,13 +13,13 @@ const ordenModel = {
 
       // 1. Insertar la orden principal
       const queryOrden = `
-        INSERT INTO orden (id_usuario, id_direccion_envio, id_metodo_pago, estado, total, fecha_pedido)
-        VALUES ($1, $2, $3, 'Pendiente', $4, NOW())
-        RETURNING *
-      `;
+              INSERT INTO orden (id_usuario, id_metodo_pago, estado, total, fecha_pedido)
+              VALUES ($1, $2, 'Pendiente', $3, NOW())
+              RETURNING *
+            `;
+
       const resultOrden = await client.query(queryOrden, [
         usuarioId,
-        direccionId,
         metodoPagoId,
         total,
       ]);
@@ -64,12 +63,14 @@ const ordenModel = {
 
   obtenerOrdenesPorUsuario: async (usuarioId) => {
     const query = `
-      SELECT o.*, m.nombre as metodo_pago_nombre, d.calle_numero, d.ciudad 
+     SELECT 
+        o.*, 
+        m.nombre AS metodo_pago_nombre
       FROM orden o
-      LEFT JOIN metodo_pago m ON o.id_metodo_pago = m.id
+      LEFT JOIN metodo_pago m 
+        ON o.id_metodo_pago = m.id
       WHERE o.id_usuario = $1
-      ORDER BY o.fecha_pedido DESC
-    `;
+      ORDER BY o.fecha_pedido DESC;`;
     const result = await pool.query(query, [usuarioId]);
     return result.rows;
   },
