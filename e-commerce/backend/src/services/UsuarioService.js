@@ -23,7 +23,9 @@ const usuarioService = {
 
   // Actualizar datos del perfil
   async modificarPerfil(usuarioId, datosNuevos) {
-    const usuarioActualizado = await UsuarioModel.update(usuarioId, datosNuevos);
+    //eliminamos rol y fecha_registro, por si vienen en la petición, ya que son datos que no se pueden modficar. 
+    const { rol, fecha_registro, ...actualizarUsuario } = datosNuevos;
+    const usuarioActualizado = await UsuarioModel.update(usuarioId, actualizarUsuario);
     // Omitimos información sensible antes de retornarlo
     const { password_hash, ...usuarioModificado } = usuarioActualizado;
     return usuarioModificado;
