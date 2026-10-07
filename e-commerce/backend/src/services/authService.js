@@ -10,9 +10,11 @@ const authService = {
         datosUsuario.password = hashedPassword
         // El registro público nunca puede asignar privilegios administrativos.
         const nuevoUsuario = { ...datosUsuario, rol: "CLIENTE" };
-        // Llamada al modelo para guardar en DB
         const usuarioDB = await UsuarioModel.postUsuario(nuevoUsuario);
-        return usuarioDB;
+        // Aquí limpiamos los datos que no queremos enviar.
+        const { password_hash, ...datosPublicos } = usuarioDB;
+        // Llamada al modelo para guardar en DB
+        return datosPublicos;
     },
 
     //método para login de usuario. 
