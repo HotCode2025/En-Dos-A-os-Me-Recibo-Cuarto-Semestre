@@ -12,7 +12,7 @@ const autenticacionMiddleware = {
     if (!token) {
       return res.status(401).json({
         ok: false,
-        mensaje: "Acceso no autirizado",
+        mensaje: "Acceso no autorizado",
       });
     }
 
