@@ -7,8 +7,6 @@ const { permitRoles } = require("../middlewares/roleMiddleware");
 // Rutas de lectura (Clientes y Administradores pueden ver los métodos de pago disponibles)[cite: 25]
 router.get(
   "/",
-  verificarToken,
-  permitRoles("CLIENTE", "ADMIN"),
   metodoPagoController.getMetodosPago,
 );
 router.get(
