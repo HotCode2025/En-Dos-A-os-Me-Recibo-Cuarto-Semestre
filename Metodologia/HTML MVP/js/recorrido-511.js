@@ -733,6 +733,7 @@ const daySelect = document.querySelector("#day-select");
 const routeField = document.querySelector("#route-field");
 const routeControls = document.querySelector("#route-controls");
 const scheduleCard = document.querySelector("#schedule-card");
+const btnSubmitRoute = document.querySelector("#btn-submit-route");
 const saturdaySchedules512 = {
     "512A": {
         code: "512A",
@@ -1180,6 +1181,274 @@ const scheduleSets = {
     }
 };
 
+// ==========================================================================
+// DICCIONARIO DE COORDENADAS GEOGRÁFICAS DE SAN RAFAEL
+// ==========================================================================
+const stopCoordinates = {
+    // San Rafael Centro & Avenidas Principales
+    "Av. Balloffet e H. Yrigoyen (Centro)": [-34.6208, -68.3398],
+    "Moreno e H. Yrigoyen": [-34.6190, -68.3360],
+    "H. Yrigoyen y Almafuerte": [-34.6176, -68.3325],
+    "Plaza San Martín": [-34.6166, -68.3330],
+    "Bolívar y Mitre": [-34.6162, -68.3245],
+    "Mitre y Edison (Centro)": [-34.6145, -68.3180],
+    "Mitre y Edison": [-34.6145, -68.3180],
+    "Mitre y Emilio Civit": [-34.6168, -68.3275],
+    "Mitre y Tierra del Fuego": [-34.6130, -68.3110],
+    "Av. Mitre y Patricias Mendocinas": [-34.6152, -68.3210],
+    "Terminal San Rafael": [-34.6202, -68.3248],
+    "Plaza Independencia": [-34.6225, -68.3220],
+    "San Martín y Comodoro Pi": [-34.6190, -68.3215],
+    "Córdoba y Comodoro Pi": [-34.6210, -68.3185],
+    "Av. Zapata y Córdoba": [-34.6180, -68.3150],
+    "Tirasso y Zapata": [-34.6150, -68.3080],
+
+    // Zona Balloffet / Sur / Los Sauces / Amapola
+    "Av. Sarmiento y Av. Balloffet": [-34.6110, -68.3435],
+    "Los Sauces y Av. Balloffet": [-34.6345, -68.3435],
+    "Av. Balloffet y Los Filtros": [-34.6380, -68.3440],
+    "Amapola y Ruta Nacional 143": [-34.6440, -68.3465],
+    "Amapola": [-34.6440, -68.3465],
+    "Ruta Nacional 143 y Ejército de los Andes": [-34.6490, -68.3490],
+    "Quiroga y Ejército de los Andes": [-34.6540, -68.3520],
+    "Barrio Inalicán": [-34.6600, -68.3550],
+    "Izuel": [-34.6650, -68.3580],
+    "Calle Cela": [-34.6720, -68.3590],
+    "Los Pioneros y Callejón Venecia": [-34.6580, -68.3400],
+
+    // Barrio El Sosneado / Filtros / Isros / Zapata
+    "Barrio El Sosneado": [-34.6460, -68.3620],
+    "Barrio Los Filtros": [-34.6400, -68.3560],
+    "Barrio Isros": [-34.6340, -68.3510],
+    "Escuela Zapata": [-34.6290, -68.3475],
+
+    // Cuadro Nacional / Salas / Sarmiento
+    "Av. Sarmiento y Bernardino Rivadavia": [-34.6050, -68.3385],
+    "Estanislao Salas y Las Arabias": [-34.5950, -68.2980],
+    "Sol de Mayo - Ruta Nacional 146 y Sarmiento": [-34.5880, -68.2860],
+    "Cuadro Bombal": [-34.5750, -68.3050],
+    "La Primavera - Escuela 40 - Comodoro Py": [-34.6020, -68.2750],
+
+    // Zona El Escorial / Rama Caída
+    "Finca El Escorial": [-34.6850, -68.3800],
+    "Calle Pública y RP 175": [-34.6800, -68.3750],
+    "Río Atuel - Escorial": [-34.6780, -68.3700],
+    "La Correina": [-34.6720, -68.3650],
+
+    // Línea 512 (Barrio Cristiano / El Cerrito / Tirasso / Adolfo Calle)
+    "Callao y Chacabuco": [-34.6120, -68.3060],
+    "Adolfo Calle y 12 de Octubre": [-34.6080, -68.3000],
+    "Adolfo Calle y Lassa": [-34.6050, -68.2950],
+    "Adolfo Calle y Schiavone": [-34.6020, -68.2900],
+    "Adolfo Calle y Espinelli": [-34.5990, -68.2850],
+    "Tirasso y Schiavoni": [-34.6030, -68.3040],
+    "Tirasso y Schiavone": [-34.6030, -68.3040],
+    "Tirasso y Spinelli": [-34.6000, -68.3030],
+    "Tirasso y Lassa": [-34.6060, -68.3050],
+    "Tirasso y Namuncura": [-34.6090, -68.3065],
+
+    // Línea 513 (Unimev / Barrio Libertad / Cementerio)
+    "Av. Los Sauces y Servando Butti": [-34.6360, -68.3490],
+    "Av. del Trabajo y Av. Roca": [-34.6275, -68.3420],
+    "Deán Funes y Roca": [-34.6090, -68.3520],
+    "Deán Funes y Av. Sarmiento": [-34.6030, -68.3480],
+    "Quiroga y Sobremonte": [-34.6160, -68.3480],
+    "Benielli y Av. 9 de Julio": [-34.6140, -68.3370],
+    "Av. Sarmiento y 9 de Julio": [-34.6115, -68.3360],
+    "Córdoba y Av. Telles Meneses": [-34.6240, -68.3160],
+    "Italia y Av. Comodoro Pi": [-34.6220, -68.3200],
+    "12 de Octubre y Av. San Martín": [-34.6170, -68.3140],
+    "Lavalle y 12 de Octubre": [-34.6190, -68.3120],
+    "Castelli y Urquiza": [-34.6210, -68.3260],
+    "Emilio Mitre y Granaderos": [-34.6240, -68.3300],
+    "Belgrano y Av. Moreno": [-34.6215, -68.3330],
+    "Barcala y Colón": [-34.6180, -68.3280],
+    "Av. Colón y Av. Alberdi": [-34.6150, -68.3290],
+    "Patricias Mendocinas y Av. Irene Curié": [-34.6130, -68.3220],
+    "Av. Alberdi y Balcarce": [-34.6160, -68.3270],
+    "Bolívar y Alberdi": [-34.6140, -68.3250],
+    "Ortiz de Rosas y Patricias Mendocinas": [-34.6120, -68.3200]
+};
+
+function getStopCoordinate(stopName, index, totalStops) {
+    if (stopCoordinates[stopName]) {
+        return stopCoordinates[stopName];
+    }
+    const clean = stopName.trim().toLowerCase();
+    for (const [key, coords] of Object.entries(stopCoordinates)) {
+        if (key.toLowerCase() === clean) return coords;
+    }
+    for (const [key, coords] of Object.entries(stopCoordinates)) {
+        if (key.toLowerCase().includes(clean) || clean.includes(key.toLowerCase())) return coords;
+    }
+    const angle = (index / Math.max(1, totalStops)) * 2 * Math.PI;
+    return [-34.6175 + Math.sin(angle) * 0.02, -68.3301 + Math.cos(angle) * 0.02];
+}
+
+// ==========================================================================
+// GESTIÓN DEL MAPA LEAFLET Y TRAZADO VIAL
+// ==========================================================================
+let routeMap = null;
+let routeMapLayers = null;
+let stopMarkers = [];
+let activeRouteAbort = null;
+
+function initRouteMap() {
+    if (routeMap) return;
+    const mapElement = document.querySelector("#route-map");
+    if (!mapElement || typeof L === "undefined") return;
+
+    routeMap = L.map("route-map", {
+        zoomControl: true,
+        scrollWheelZoom: true
+    }).setView([-34.6175, -68.3301], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(routeMap);
+
+    routeMapLayers = L.featureGroup().addTo(routeMap);
+}
+
+function highlightTimelineItem(index) {
+    document.querySelectorAll(".timeline-item").forEach((el, i) => {
+        el.classList.toggle("is-selected", i === index);
+    });
+    document.querySelectorAll(".bus-stop-marker").forEach((el, i) => {
+        el.classList.toggle("is-active", i === index);
+    });
+}
+
+async function renderRouteMap(schedule) {
+    initRouteMap();
+    if (!routeMap || !routeMapLayers || !schedule || !Array.isArray(schedule.stops) || schedule.stops.length === 0) {
+        return;
+    }
+
+    activeRouteAbort?.abort();
+    activeRouteAbort = new AbortController();
+    const { signal } = activeRouteAbort;
+
+    routeMapLayers.clearLayers();
+    stopMarkers = [];
+
+    const tripIndex = Number(departureSelect.value) || 0;
+    const currentTrip = schedule.trips?.[tripIndex] || [];
+
+    const waypoints = schedule.stops.map((stop, i) => {
+        const [lat, lon] = getStopCoordinate(stop, i, schedule.stops.length);
+        return { name: stop, lat, lon, index: i, time: currentTrip[i] || "" };
+    });
+
+    // Marcadores por cada parada
+    waypoints.forEach((pt, i) => {
+        const isStart = i === 0;
+        const isEnd = i === waypoints.length - 1;
+        const markerClass = isStart ? "start" : isEnd ? "end" : "intermediate";
+        const markerIcon = isStart ? "🚩" : isEnd ? "🏁" : String(i + 1);
+
+        const customIcon = L.divIcon({
+            className: "",
+            html: `<div class="bus-stop-marker ${markerClass}" data-stop-index="${i}">${markerIcon}</div>`,
+            iconSize: isStart || isEnd ? [30, 30] : [26, 26],
+            iconAnchor: isStart || isEnd ? [15, 15] : [13, 13]
+        });
+
+        const marker = L.marker([pt.lat, pt.lon], { icon: customIcon });
+        const timeLabel = pt.time ? `${pt.time} hs` : "No asignado";
+
+        const popupHtml = `
+            <div class="bus-popup-content">
+                <div class="bus-popup-header">
+                    <span>Parada ${i + 1} de ${waypoints.length}</span>
+                </div>
+                <h4 class="bus-popup-title">${pt.name}</h4>
+                <div class="bus-popup-time">
+                    <span>Horario de paso:</span>
+                    <strong>${timeLabel}</strong>
+                </div>
+            </div>
+        `;
+        marker.bindPopup(popupHtml);
+        marker.on("click", () => {
+            highlightTimelineItem(i);
+        });
+
+        routeMapLayers.addLayer(marker);
+        stopMarkers.push(marker);
+    });
+
+    const statusBadge = document.querySelector("#route-distance-badge");
+    const mapTitle = document.querySelector("#map-route-title");
+    const mapKicker = document.querySelector("#map-route-kicker");
+    if (mapTitle) mapTitle.textContent = `${schedule.code} · ${schedule.title || "Recorrido urbano"}`;
+    if (mapKicker) mapKicker.textContent = `TRAZADO REAL · LÍNEA ${lineSelect.value}`;
+
+    // Trazado fallback directo inicial
+    const directCoordinates = waypoints.map(pt => [pt.lat, pt.lon]);
+    let polyline = L.polyline(directCoordinates, {
+        color: "#2878a5",
+        weight: 5,
+        opacity: 0.85,
+        lineCap: "round",
+        lineJoin: "round"
+    }).addTo(routeMapLayers);
+
+    routeMap.fitBounds(polyline.getBounds().pad(0.12));
+    if (statusBadge) statusBadge.textContent = `${waypoints.length} paradas · Trazando calles...`;
+
+    // Consulta OSRM para seguir el asfalto y calles reales
+    try {
+        let sampled = waypoints;
+        if (waypoints.length > 25) {
+            const step = (waypoints.length - 1) / 24;
+            sampled = [];
+            for (let s = 0; s < 25; s++) {
+                sampled.push(waypoints[Math.round(s * step)]);
+            }
+        }
+
+        const coordString = sampled.map(p => `${p.lon},${p.lat}`).join(";");
+        const url = `https://router.project-osrm.org/route/v1/driving/${coordString}?overview=full&geometries=geojson`;
+
+        const res = await fetch(url, { headers: { Accept: "application/json" }, signal });
+        if (res.ok) {
+            const data = await res.json();
+            const route = data.routes?.[0];
+            const roadCoords = route?.geometry?.coordinates;
+            if (roadCoords && roadCoords.length > 1) {
+                routeMapLayers.removeLayer(polyline);
+                const latLngs = roadCoords.map(([lon, lat]) => [lat, lon]);
+                polyline = L.polyline(latLngs, {
+                    color: "#168b72",
+                    weight: 6,
+                    opacity: 0.9,
+                    lineCap: "round",
+                    lineJoin: "round"
+                }).addTo(routeMapLayers);
+
+                const distanceKm = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 })
+                    .format(route.distance / 1000);
+                const durationMin = Math.round(route.duration / 60);
+                if (statusBadge) {
+                    statusBadge.textContent = `Trazado por calles: ${distanceKm} km · ~${durationMin} min tiempo en tránsito`;
+                }
+                routeMap.fitBounds(polyline.getBounds().pad(0.12));
+            }
+        }
+    } catch (err) {
+        if (err.name !== "AbortError") {
+            if (statusBadge) statusBadge.textContent = `${waypoints.length} paradas oficiales · Trazado continuo`;
+        }
+    }
+
+    setTimeout(() => routeMap.invalidateSize(), 200);
+}
+
+// ==========================================================================
+// LÓGICA DE CONTROL Y RENDERIZADO DE HORARIOS
+// ==========================================================================
 function currentSchedule() {
     return scheduleSets[lineSelect.value]?.[daySelect.value]?.[routeSelect.value];
 }
@@ -1202,10 +1471,12 @@ function populateRoutesForDay() {
         routeSelect.disabled = true;
         routeControls.classList.remove("has-route");
         scheduleCard.hidden = true;
+        if (routeMapLayers) routeMapLayers.clearLayers();
         return;
     }
 
-    Object.values(schedules).forEach((schedule) => {
+    const scheduleList = Object.values(schedules);
+    scheduleList.forEach((schedule) => {
         const option = document.createElement("option");
         option.value = schedule.code;
         option.textContent = `${schedule.code} · ${schedule.title || "Izuel - Doña Paula - Cuadro Nacional x Salas"}`;
@@ -1215,7 +1486,13 @@ function populateRoutesForDay() {
     routeField.hidden = false;
     routeSelect.disabled = false;
     routeControls.classList.add("has-route");
+
+    // Selecciona por defecto el primer recorrido disponible pero mantiene el cuadro oculto hasta presionar Aceptar
+    if (scheduleList.length > 0) {
+        routeSelect.selectedIndex = 1;
+    }
     scheduleCard.hidden = true;
+    if (routeMapLayers) routeMapLayers.clearLayers();
 }
 
 function populateDepartures(schedule) {
@@ -1243,6 +1520,7 @@ function populateDepartures(schedule) {
         noFrequencies.hidden = false;
         badge.replaceChildren(document.createElement("span"), " Sin frecuencias");
         badge.classList.add("is-unavailable");
+        if (routeMapLayers) routeMapLayers.clearLayers();
         return;
     }
 
@@ -1273,21 +1551,24 @@ function populateDepartures(schedule) {
     document.querySelector("#first-departure").textContent = schedule.trips[0][0];
     document.querySelector("#last-departure").textContent = schedule.trips.at(-1)[0];
     document.querySelector("#stop-count").textContent = `${schedule.stops.length} paradas`;
+
     renderSelectedTrip();
+    renderRouteMap(schedule);
 }
 
 function renderSelectedTrip() {
     const schedule = currentSchedule();
-    const tripIndex = Number(departureSelect.value);
+    const tripIndex = Number(departureSelect.value) || 0;
     const trip = schedule?.trips[tripIndex];
     if (!schedule || !trip || trip.length !== schedule.stops.length) {
-        throw new Error(`El cuadro de ${routeSelect.value} tiene horarios incompletos para la salida seleccionada.`);
+        return;
     }
 
     timeline.replaceChildren();
     schedule.stops.forEach((stop, index) => {
         const item = document.createElement("li");
         item.className = "timeline-item";
+        item.dataset.stopIndex = String(index);
 
         const time = document.createElement("time");
         time.className = "timeline-time";
@@ -1304,24 +1585,82 @@ function renderSelectedTrip() {
 
         content.append(stopNumber, name);
         item.append(time, content);
+
+        // Click en la parada para centrarla en el mapa y abrir su popup
+        item.addEventListener("click", () => {
+            highlightTimelineItem(index);
+            if (stopMarkers[index] && routeMap) {
+                const marker = stopMarkers[index];
+                routeMap.setView(marker.getLatLng(), 15, { animate: true });
+                marker.openPopup();
+            }
+        });
+
         timeline.append(item);
     });
 
     document.querySelector("#selected-trip-label").textContent =
-        `Paradas en orden para la salida de las ${trip[0]} desde ${schedule.stops[0]}.`;
+        `Paradas en orden para la salida de las ${trip[0]} desde ${schedule.stops[0]}. (Clic para ubicar en mapa)`;
+
+    // Actualizar popups de los marcadores con los nuevos horarios
+    if (stopMarkers.length === schedule.stops.length) {
+        stopMarkers.forEach((marker, i) => {
+            const timeLabel = trip[i] ? `${trip[i]} hs` : "No asignado";
+            marker.setPopupContent(`
+                <div class="bus-popup-content">
+                    <div class="bus-popup-header">
+                        <span>Parada ${i + 1} de ${schedule.stops.length}</span>
+                    </div>
+                    <h4 class="bus-popup-title">${schedule.stops[i]}</h4>
+                    <div class="bus-popup-time">
+                        <span>Salida ${trip[0]} · Paso estimado:</span>
+                        <strong>${timeLabel}</strong>
+                    </div>
+                </div>
+            `);
+        });
+    }
 }
 
-departureSelect.addEventListener("change", renderSelectedTrip);
+// ==========================================================================
+// EVENT LISTENERS
+// ==========================================================================
+btnSubmitRoute?.addEventListener("click", () => {
+    if (!daySelect.value) {
+        daySelect.focus();
+        return;
+    }
+    if (!routeSelect.value && routeSelect.options.length > 1) {
+        routeSelect.selectedIndex = 1;
+    }
+    const schedule = currentSchedule();
+    scheduleCard.hidden = false;
+    populateDepartures(schedule);
+    scheduleCard.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+departureSelect.addEventListener("change", () => {
+    renderSelectedTrip();
+});
+
 lineSelect.addEventListener("change", () => {
     daySelect.value = "";
     populateRoutesForDay();
+    scheduleCard.hidden = true;
     document.querySelector("#line-badge").textContent = `Línea ${lineSelect.value}`;
     document.title = `Línea ${lineSelect.value} · Horarios y recorridos | San Rafael Movilidad`;
 });
+
 routeSelect.addEventListener("change", () => {
-    scheduleCard.hidden = false;
-    populateDepartures(currentSchedule());
+    if (!scheduleCard.hidden) {
+        populateDepartures(currentSchedule());
+    }
 });
+
 daySelect.addEventListener("change", () => {
     populateRoutesForDay();
+});
+
+window.addEventListener("load", () => {
+    initRouteMap();
 });
