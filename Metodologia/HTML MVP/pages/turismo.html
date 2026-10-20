@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>San Rafael Movilidad - Puntos Turísticos</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/turismo.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/turismo.css">
 </head>
 
 <body>
@@ -14,15 +14,15 @@
     <!-- Encabezado / Barra de Navegación Global -->
     <header class="main-header">
         <div class="header-container">
-            <div class="logo">
+            <a class="logo" href="../index.html" aria-label="San Rafael Movilidad, inicio">
                 <span class="logo-icon">🚌</span>
                 <h1>San Rafael <span>Movilidad</span></h1>
-            </div>
+            </a>
             <nav class="main-nav">
                 <ul>
-                    <li><a href="/" class="active">Inicio</a></li>
+                    <li><a href="../index.html">Inicio</a></li>
                     <li><a href="recorrido.html">Recorridos</a></li>
-                    <li><a href="turismo.html">Puntos Turísticos</a></li>
+                    <li><a href="turismo.html" class="active" aria-current="page">Puntos Turísticos</a></li>
                     <li><a href="feedback.html">Feedback</a></li>
                     <li><a href="login.html" class="btn-login">Mi Cuenta</a></li>
                 </ul>
@@ -54,7 +54,7 @@
             <!-- Tarjeta 1: Valle Grande -->
             <article class="tourism-card">
                 <div class="card-image-placeholder">
-                    <img class="image" src="/img/cañon-atuel.jpg" alt="Cañon Atuel" srcset="">
+                    <img class="image" src="../img/cañon-atuel.jpg" alt="Cañon Atuel" srcset="">
                     <span class="category-tag">Naturaleza</span>
                 </div>
                 <div class="card-body">
@@ -78,7 +78,7 @@
             <!-- Tarjeta 2: Laberinto de Borges -->
             <article class="tourism-card">
                 <div class="card-image-placeholder">
-                    <img class="image" src="/img/laberinto-borges.webp" alt="Laberinto de Borges" srcset="">
+                    <img class="image" src="../img/laberinto-borges.webp" alt="Laberinto de Borges" srcset="">
                     <span class="category-tag">Cultura e Historia</span>
                 </div>
                 <div class="card-body">
@@ -102,7 +102,7 @@
             <!-- Tarjeta 3: Plaza San Martín -->
             <article class="tourism-card">
                 <div class="card-image-placeholder">
-                    <img class="image" src="/img/plaza-san-martin.jpg" alt="Plaza San Martín" srcset="">
+                    <img class="image" src="../img/plaza-san-martin.jpg" alt="Plaza San Martín" srcset="">
                     <span class="category-tag">Cultura e Historia</span>
                 </div>
                 <div class="card-body">
@@ -138,6 +138,7 @@
         </div>
     </footer>
 
+    <script src="../js/auth.js"></script>
 </body>
 
 </html>

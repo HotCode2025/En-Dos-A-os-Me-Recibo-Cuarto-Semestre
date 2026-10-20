@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>San Rafael Movilidad - Inicio</title>
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 </head>
@@ -16,17 +16,17 @@
     <!-- Encabezado / Barra de Navegación Global -->
     <header class="main-header">
         <div class="header-container">
-            <div class="logo">
+            <a class="logo" href="index.html" aria-label="San Rafael Movilidad, inicio">
                 <span class="logo-icon">🚌</span>
                 <h1>San Rafael <span>Movilidad</span></h1>
-            </div>
+            </a>
             <nav class="main-nav">
                 <ul>
-                    <li><a href="/" class="active" aria-current="page">Inicio</a></li>
-                    <li><a href="/pages/recorrido.html">Recorridos</a></li>
-                    <li><a href="/pages/turismo.html">Puntos Turísticos</a></li>
+                    <li><a href="index.html" class="active" aria-current="page">Inicio</a></li>
+                    <li><a href="pages/recorrido.html">Recorridos</a></li>
+                    <li><a href="pages/turismo.html">Puntos Turísticos</a></li>
                     <li><a href="pages/feedback.html">Feedback</a></li>
-                    <li><a href="/pages/login.html" class="btn-login">Mi Cuenta</a></li>
+                    <li><a href="pages/login.html" class="btn-login">Mi Cuenta</a></li>
                 </ul>
             </nav>
         </div>
@@ -55,7 +55,7 @@
                         <span class="schedule-shortcut-icon" aria-hidden="true">🚌</span>
                         <div>
                             <strong>¿Buscas los horarios del colectivo?</strong>
-                            <a href="/pages/recorrido.html">Consulta recorridos y horarios de la línea 511 <span aria-hidden="true">→</span></a>
+                            <a href="pages/recorrido.html">Consulta recorridos y horarios de la línea 511 <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                     <button type="submit" class="btn-search">
@@ -278,6 +278,7 @@
 
     window.addEventListener("load", () => map.invalidateSize());
 </script>
+<script src="js/auth.js"></script>
 
 </body>
 </html>

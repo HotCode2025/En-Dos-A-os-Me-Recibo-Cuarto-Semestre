@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA LEYENDA DE AANG: AVATAR</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+    <!-- Encabezado principal del juego -->
+    <h1 class="titulo-avatar">
+        <span class="titulo-principal">LA LEYENDA DE AANG</span>
+        <span class="titulo-secundario">⚔️ EL DESAFÍO DEL AVATAR ⚔️</span>
+    </h1>   
+
+    <!-- Sección desplegable con las instrucciones del juego -->
+    <section id="reglas">
+        <details>
+            <summary>Reglas del juego</summary>
+            <p>Primero debes seleccionar un personaje para comenzar.</p>
+            <p>El jugador y el enemigo comienzan con 3 vidas cada uno.</p>
+            <p>Reglas de combate:</p>
+            <ul>
+                <li>La patada le gana al puño</li>
+                <li>El puño le gana a la barrida</li>
+                <li>La barrida le gana a la patada</li>
+            </ul>
+        </details>
+    </section>
+
+    <!-- Primera fase del flujo: Selección de avatar por parte del usuario -->
+    <section id="seleccionar-personaje">
+        <h2>Elige tu Personaje</h2>
+        <!-- Ya no hay tarjetas escritas a mano: este contenedor arranca
+             vacío y JavaScript lo llena dinámicamente recorriendo el
+             array "avatares" con forEach. Agregar un personaje nuevo
+             ya NO requiere tocar este archivo. -->
+        <div class="personajes" id="contenedorTarjetas"></div>
+        <button id="boton-personaje">Seleccionar</button>
+    </section>
+
+    <!-- Fase del mapa: el personaje elegido se mueve dentro de un canvas.
+         Mientras se mantiene apretado un botón (onmousedown) el personaje
+         se mueve; al soltarlo (onmouseup) se detiene. -->
+    <section id="ver-mapa">
+        <h2>Recorre el mapa con tu personaje</h2>
+        <canvas id="mapa"></canvas>
+        <div class="contenedor-botones">
+            <button class="boton-movimiento" onmousedown="moverArriba()" onmouseup="detenerMovimiento()">⬆️ Arriba</button>
+            <button class="boton-movimiento" onmousedown="moverIzquierda()" onmouseup="detenerMovimiento()">⬅️ Izquierda</button>
+            <button class="boton-movimiento" onmousedown="moverAbajo()" onmouseup="detenerMovimiento()">⬇️ Abajo</button>
+            <button class="boton-movimiento" onmousedown="moverDerecha()" onmouseup="detenerMovimiento()">➡️ Derecha</button>
+        </div>
+    </section>
+
+    <!-- Segunda fase del flujo: Arena donde se ejecuta y visualiza el combate -->
+    <section id="seleccionar-ataque">
+        <h2>¡Que comience el duelo!</h2>
+        
+        <!-- Tarjetas donde se renderizan las métricas y los ataques visuales de los jugadores -->
+        <div class="arena-combate">
+            <div class="tarjeta-combate" id="tarjeta-jugador">
+                <h3 id="personaje-jugador">Jugador</h3>
+                <div class="corazones" id="vidas-jugador">❤️❤️❤️</div>
+                <div class="pantalla-ataque" id="ataque-visu-jugador">❓</div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="tarjeta-combate" id="tarjeta-enemigo">
+                <h3 id="personaje-enemigo">Enemigo</h3>
+                <div class="corazones" id="vidas-enemigo">❤️❤️❤️</div>
+                <div class="pantalla-ataque" id="ataque-visu-enemigo">❓</div>
+            </div>
+        </div>
+
+        <!-- Banner dinámico con información sobre el resultado de la ronda -->
+        <div id="banner-resultado">Elige tu movimiento</div>
+
+        <!-- Controles para ejecutar las acciones del personaje -->
+        <div class="contenedor-botones">
+            <button id="boton-punio">Puño 👊</button>
+            <button id="boton-patada">Patada 🦵</button>
+            <button id="boton-barrida">Barrida 👣</button>
+        </div>
+    </section>
+
+    <!-- Tercera fase del flujo: Botón que se activa únicamente al finalizar la partida -->
+    <section id="reiniciar">
+        <button id="boton-reiniciar">Reiniciar</button>
+    </section>
+
+    <script src="./js/avatar.js"></script>
+</body>
+</html>

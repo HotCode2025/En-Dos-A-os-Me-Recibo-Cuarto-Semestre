@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>San Rafael Movilidad - Acceso</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/login.css">
 
 </head>
 
@@ -15,59 +15,178 @@
     <!-- Encabezado / Barra de Navegación Global -->
     <header class="main-header">
         <div class="header-container">
-            <div class="logo">
+            <a class="logo" href="../index.html" aria-label="San Rafael Movilidad, inicio">
                 <span class="logo-icon">🚌</span>
                 <h1>San Rafael <span>Movilidad</span></h1>
-            </div>
+            </a>
             <nav class="main-nav">
                 <ul>
-                    <li><a href="/" class="active">Inicio</a></li>
+                    <li><a href="../index.html">Inicio</a></li>
                     <li><a href="recorrido.html">Recorridos</a></li>
                     <li><a href="turismo.html">Puntos Turísticos</a></li>
                     <li><a href="feedback.html">Feedback</a></li>
-                    <li><a href="login.html" class="btn-login">Mi Cuenta</a></li>
+                    <li><a href="login.html" class="btn-login active" aria-current="page">Mi Cuenta</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Contenedor del Formulario de Acceso -->
+    <!-- Contenedor del Formulario de Acceso y Perfil -->
     <main class="login-bg">
-        <div class="login-container">
+        <div class="login-wrapper">
 
-            <!-- Selectores de pestaña simulados -->
-            <div class="login-tabs">
-                <button class="tab-btn active" id="tab-login">Iniciar Sesión</button>
-                <button class="tab-btn" id="tab-register">Crear Cuenta</button>
+            <!-- Banner de Alertas (Errores / Éxito) -->
+            <div id="auth-alert" class="form-alert" role="alert" aria-live="polite" hidden></div>
+
+            <!-- CONTENEDOR 1: LOGIN Y REGISTRO (para usuarios no logueados) -->
+            <div class="login-container" id="auth-container">
+
+                <!-- Selectores de pestaña -->
+                <div class="login-tabs">
+                    <button type="button" class="tab-btn active" id="tab-login">Iniciar Sesión</button>
+                    <button type="button" class="tab-btn" id="tab-register">Crear Cuenta</button>
+                </div>
+
+                <!-- Formulario de Login -->
+                <form class="login-form" id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Correo Electrónico</label>
+                        <input type="email" id="login-email" placeholder="ejemplo@correo.com" autocomplete="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="label-wrapper">
+                            <label for="login-pass">Contraseña</label>
+                            <a href="#" class="forgot-link">¿La olvidaste?</a>
+                        </div>
+                        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+
+                    <div class="form-remember">
+                        <input type="checkbox" id="remember-me" checked>
+                        <label for="remember-me">Recordar mi sesión en este dispositivo</label>
+                    </div>
+
+                    <button type="submit" class="btn-login-submit">Ingresar al Panel</button>
+                </form>
+
+                <!-- Formulario de Registro (Crear Cuenta) -->
+                <form class="login-form" id="register-form" hidden>
+                    <div class="form-group">
+                        <label for="register-name">Nombre y Apellido</label>
+                        <input type="text" id="register-name" placeholder="Ej: Juan Pérez" autocomplete="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-email">Correo Electrónico</label>
+                        <input type="email" id="register-email" placeholder="nombre@correo.com" autocomplete="email" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register-zone">Barrio / Zona habitual</label>
+                            <select id="register-zone">
+                                <option value="Centro" selected>San Rafael Centro</option>
+                                <option value="Cuadro Nacional">Cuadro Nacional</option>
+                                <option value="Barrio El Sosneado">Barrio El Sosneado</option>
+                                <option value="Barrio Los Filtros">Barrio Los Filtros</option>
+                                <option value="Barrio Unimev">Barrio Unimev</option>
+                                <option value="Rama Caída">Rama Caída</option>
+                                <option value="Pueblo Diamante">Pueblo Diamante</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-line">Línea más utilizada</label>
+                            <select id="register-line">
+                                <option value="511" selected>Línea 511 (Iselín)</option>
+                                <option value="512">Línea 512</option>
+                                <option value="513">Línea 513</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-pass">Contraseña (mínimo 6 caracteres)</label>
+                        <input type="password" id="register-pass" placeholder="••••••••" minlength="6" autocomplete="new-password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-confirm-pass">Confirmar Contraseña</label>
+                        <input type="password" id="register-confirm-pass" placeholder="••••••••" minlength="6" autocomplete="new-password" required>
+                    </div>
+
+                    <div class="form-remember">
+                        <input type="checkbox" id="register-terms" required checked>
+                        <label for="register-terms">Acepto los términos de uso y comunidad de San Rafael Movilidad</label>
+                    </div>
+
+                    <button type="submit" class="btn-login-submit">Registrarme y Crear Cuenta</button>
+                </form>
+
+                <!-- Mensaje de ayuda al pie del formulario -->
+                <div class="login-footer-help">
+                    <p>Al iniciar sesión podés consultar tus líneas favoritas y realizar reportes de demoras en el sistema de feedback.</p>
+                </div>
+
             </div>
 
-            <!-- Formulario de Login -->
-            <form class="login-form">
-                <div class="form-group">
-                    <label for="login-email">Correo Electrónico</label>
-                    <input type="email" id="login-email" placeholder="ejemplo@correo.com" required>
-                </div>
-
-                <div class="form-group">
-                    <div class="label-wrapper">
-                        <label for="login-pass">Contraseña</label>
-                        <a href="#" class="forgot-link">¿La olvidaste?</a>
+            <!-- CONTENEDOR 2: VISTA DE PERFIL (para usuarios logueados) -->
+            <div class="profile-card" id="profile-container" hidden>
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <span id="profile-avatar-initials">SR</span>
                     </div>
-                    <input type="password" id="login-pass" placeholder="••••••••" required>
+                    <div class="profile-header-info">
+                        <span class="profile-badge">Usuario Registrado</span>
+                        <h2 id="profile-name">Usuario</h2>
+                        <p id="profile-email">usuario@correo.com</p>
+                    </div>
                 </div>
 
-                <div class="form-remember">
-                    <input type="checkbox" id="remember-me">
-                    <label for="remember-me">Recordar mi sesión en este dispositivo</label>
+                <div class="profile-body">
+                    <h3>Mis Preferencias de Movilidad</h3>
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-box">
+                            <span class="stat-icon">📍</span>
+                            <div>
+                                <span class="stat-label">Zona de Residencia</span>
+                                <strong id="profile-zone">San Rafael Centro</strong>
+                            </div>
+                        </div>
+                        <div class="profile-stat-box">
+                            <span class="stat-icon">🚌</span>
+                            <div>
+                                <span class="stat-label">Línea Preferida</span>
+                                <strong id="profile-line">Línea 511</strong>
+                            </div>
+                        </div>
+                        <div class="profile-stat-box">
+                            <span class="stat-icon">📅</span>
+                            <div>
+                                <span class="stat-label">Miembro Desde</span>
+                                <strong id="profile-date">Hoy</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-quick-actions">
+                        <a href="recorrido.html" class="profile-btn-action">
+                            <span>🕒 Ver Recorridos y Horarios</span>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                        <a href="feedback.html" class="profile-btn-action secondary">
+                            <span>💬 Enviar Reporte de Colectivo</span>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+
+                    <div class="profile-footer-action">
+                        <button type="button" id="btn-logout" class="btn-logout">
+                            <span>Cerrar Sesión</span>
+                            <span aria-hidden="true">🚪</span>
+                        </button>
+                    </div>
                 </div>
-
-                <button type="submit" class="btn-login-submit">Ingresar al Panel</button>
-            </form>
-
-            <!-- Mensaje de ayuda al pie del formulario -->
-            <div class="login-footer-help">
-                <p>Al iniciar sesión podés guardar tus recorridos favoritos y realizar reportes firmados en el sistema
-                    de feedback.</p>
             </div>
 
         </div>
@@ -85,6 +204,7 @@
         </div>
     </footer>
 
+    <script src="../js/auth.js"></script>
 </body>
 
 </html>
