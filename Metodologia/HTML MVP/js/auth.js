@@ -128,7 +128,16 @@
             if (nameEl) nameEl.textContent = user.name;
             if (emailEl) emailEl.textContent = user.email;
             if (zoneEl) zoneEl.textContent = user.zone || "San Rafael Centro";
-            if (lineEl) lineEl.textContent = user.favoriteLine ? `Línea ${user.favoriteLine}` : "Línea 511";
+            if (lineEl) {
+                const favoriteLine = user.favoriteLine;
+                const isButini = favoriteLine === "LABERINTO"
+                    || (Number(favoriteLine) >= 541 && Number(favoriteLine) <= 575);
+                lineEl.textContent = favoriteLine === "LABERINTO"
+                    ? "Laberinto de Borges - BUTINI"
+                    : favoriteLine
+                        ? `Línea ${favoriteLine} - ${isButini ? "BUTINI" : "ISELIN"}`
+                        : "Línea 511 - ISELIN";
+            }
             if (dateEl) dateEl.textContent = user.createdAt || "Reciente";
 
             if (avatarEl) {

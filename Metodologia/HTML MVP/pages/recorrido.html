@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Horarios y paradas de los recorridos de la línea 511 de Autotransportes Iselín S.A.">
-    <title>Línea 511 · Horarios y recorridos | San Rafael Movilidad</title>
+    <meta name="description" content="Horarios y paradas de las líneas 511 a 575 de ISELIN y BUTINI en San Rafael.">
+    <title>Línea 511 - ISELIN · Horarios y recorridos | San Rafael Movilidad</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/recorrido.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -34,7 +34,7 @@
     <main class="schedule-section">
         <a class="back-link" href="../index.html">← Volver al inicio</a>
         <section class="route-header" aria-labelledby="page-title">
-            <span class="route-badge" id="line-badge">Línea 511</span>
+            <span class="route-badge" id="line-badge">Línea 511 - ISELIN</span>
             <span class="route-kicker">HORARIOS OFICIALES · SAN RAFAEL</span>
             <h2 id="page-title">Recorridos y horarios</h2>
             <p class="route-company">Empresa prestadora: <strong>Autotransportes Iselín S.A.</strong></p>
@@ -45,9 +45,29 @@
             <div class="control-field">
                 <label for="line-select">Línea</label>
                 <select id="line-select">
-                    <option value="511" selected>Línea 511</option>
-                    <option value="512">Línea 512</option>
-                    <option value="513">Línea 513</option>
+                    <option value="511" selected>Línea 511 - ISELIN</option>
+                    <option value="512">Línea 512 - ISELIN</option>
+                    <option value="513">Línea 513 - ISELIN</option>
+                    <option value="514">Línea 514 - ISELIN</option>
+                    <option value="515">Línea 515 - ISELIN</option>
+                    <option value="516">Línea 516 - ISELIN</option>
+                    <option value="517">Línea 517 - ISELIN</option>
+                    <option value="518">Línea 518 - ISELIN</option>
+                    <option value="519">Línea 519 - ISELIN</option>
+                    <option value="520">Línea 520 - ISELIN</option>
+                    <option value="541" data-company="BUTINI">Línea 541 - BUTINI</option>
+                    <option value="542" data-company="BUTINI">Línea 542 - BUTINI</option>
+                    <option value="543" data-company="BUTINI">Línea 543 - BUTINI</option>
+                    <option value="544" data-company="BUTINI">Línea 544 - BUTINI</option>
+                    <option value="545" data-company="BUTINI">Línea 545 - BUTINI</option>
+                    <option value="547" data-company="BUTINI">Línea 547 - BUTINI</option>
+                    <option value="548" data-company="BUTINI">Línea 548 - BUTINI</option>
+                    <option value="571" data-company="BUTINI">Línea 571 - BUTINI</option>
+                    <option value="572" data-company="BUTINI">Línea 572 - BUTINI</option>
+                    <option value="573" data-company="BUTINI">Línea 573 - BUTINI</option>
+                    <option value="574" data-company="BUTINI">Línea 574 - BUTINI</option>
+                    <option value="575" data-company="BUTINI">Línea 575 - BUTINI</option>
+                    <option value="LABERINTO" data-company="BUTINI">Laberinto de Borges - BUTINI</option>
                 </select>
             </div>
             <div class="control-field">
@@ -159,7 +179,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="../js/recorrido-511.js"></script>
+    <script src="../js/recorrido-butini.js"></script>
+    <script src="../js/recorrido.js"></script>
     <script src="../js/auth.js"></script>
 </body>
 
