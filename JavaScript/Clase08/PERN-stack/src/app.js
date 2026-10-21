@@ -3,10 +3,17 @@ import morgan from "morgan";
 import tareasRoutes from "./router/tareas.routes.js";
 import authRoutes from "./router/auth.routes.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 const app = express(); // Creamos una instancia de express
 // Middlewares
 app.use(morgan("dev")); // Esto es para ver las peticiones en la consola
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+); // Esto es para permitir solicitudes desde otros dominios
 app.use(cookieParser()); // Esto es para que express entienda las cookies
 app.use(express.json()); // Esto es para que express entienda el json
 app.use(express.urlencoded({ extended: false })); // Esto es para que express entienda el urlencoded, se utiliza para enviar formularios

@@ -21,11 +21,14 @@ export const signin = async (req, res) => {
 
   const token = await createAccessToken({ id: result.rows[0].id });
   console.log(result);
+
   res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "none",
+    // httpOnly: true, // Recomendado por seguridad para que el frontend no la lea con JS
+    // secure: true, // Usar solo en producción con HTTPS
+    sameSite: "none", // Usar solo si frontend y backend están en dominios distintos con HTTPS
     maxAge: 60 * 60 * 24 * 1000, // 1 day
   });
+
   return res.json(result.rows[0]);
 };
 
@@ -42,11 +45,14 @@ export const signup = async (req, res, next) => {
     );
     const token = await createAccessToken({ id: result.rows[0].id });
     console.log(result);
+
     res.cookie("token", token, {
-      httpOnly: true,
+      // httpOnly: true,
+      // secure: true,
       sameSite: "none",
       maxAge: 60 * 60 * 24 * 1000, // 1 day
     });
+
     return res.json(result.rows[0]);
   } catch (error) {
     if (error.code === "23505") {

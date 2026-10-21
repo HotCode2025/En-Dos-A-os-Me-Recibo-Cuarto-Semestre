@@ -1,5 +1,7 @@
-import { Button, Card, Input } from "../components/ui";
+import { Button, Card, Input, Label } from "../components/ui";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function RegisterPage() {
   const {
@@ -8,16 +10,20 @@ function RegisterPage() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+
+  const onSubmit = handleSubmit(async (data) => {
+    await signup(data);
+    navigate("/perfil");
   });
-  console.log(errors);
 
   return (
     <div className="h-[calc(100vh-64px)] flex items-center justify-center ">
       <Card>
-        <h3 className="text-2xl font-bold">Registro</h3>
+        <h3 className="text-4xl font-bold my-2">Registro</h3>
         <form onSubmit={onSubmit}>
+          <Label htmlFor="name">Nombre</Label>
           <Input
             placeholder="Ingrese su nombre"
             {...register("name", { required: true })}
@@ -25,6 +31,7 @@ function RegisterPage() {
           {errors.name && (
             <p className="text-red-500">El nombre es requerido</p>
           )}
+          <Label htmlFor="email">Email</Label>
           <Input
             type="email"
             placeholder="Ingrese su email"
@@ -33,6 +40,7 @@ function RegisterPage() {
           {errors.email && (
             <p className="text-red-500">El email es requerido</p>
           )}
+          <Label htmlFor="password">Contraseña</Label>
           <Input
             type="password"
             placeholder="Ingrese su contraseña"
@@ -44,6 +52,10 @@ function RegisterPage() {
 
           <Button>Registrarse</Button>
         </form>
+        <div className=" flex justify-between my-4">
+          <p>¿Ya tienes una cuenta?</p>
+          <Link to="/login">Iniciar Sesión</Link>
+        </div>
       </Card>
     </div>
   );
