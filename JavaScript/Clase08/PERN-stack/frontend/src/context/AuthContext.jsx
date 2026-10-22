@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useState, useContext } from "react";
-import axios from "axios";
+import { createContext, useState, useContext, useEffect } from "react";
+import Cookie from "js-cookie";
+import axios from "../api/axios";
 
 export const AuthContext = createContext();
 
@@ -18,20 +19,58 @@ export function AuthProvider({ children }) {
   const [errors, setErrors] = useState(null);
 
   const signin = async (data) => {
-    const res = await axios.post("http://localhost:3000/api/signin", data, {
-      withCredentials: true,
-    });
-    console.log(res.data);
-    setUser(res.data);
+    try {
+      const res = await axios.post("/signin", data);
+      setUser(res.data);
+      setIsAuth(true);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      if (Array.isArray(error.response.data)) {
+        return setErrors(error.response.data);
+      }
+      setErrors([error.response.data.message]);
+    }
   };
 
   const signup = async (data) => {
-    const res = await axios.post("http://localhost:3000/api/signup", data, {
-      withCredentials: true,
-    });
-    console.log(res.data);
-    setUser(res.data);
+    try {
+      const res = await axios.post("/signup", data);
+      setUser(res.data);
+      setIsAuth(true);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      if (Array.isArray(error.response.data)) {
+        return setErrors(error.response.data);
+      }
+      setErrors([error.response.data.message]);
+    }
   };
+
+  const signout = async () => {
+    const res = await axios.post("/signout").then(() => {
+      setUser(null);
+      setIsAuth(false);
+      return res.data;
+    });
+  };
+
+  useEffect(() => {
+    if (Cookie.get("token")) {
+      axios
+        .get("/profile")
+        .then((res) => {
+          setUser(res.data);
+          setIsAuth(true);
+        })
+        .catch((error) => {
+          setUser(null);
+          setIsAuth(false);
+          console.log(error);
+        });
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -42,8 +81,7 @@ export function AuthProvider({ children }) {
         signup,
         signin,
         setUser,
-        setIsAuth,
-        setErrors,
+        signout,
       }}
     >
       {children}

@@ -25,7 +25,7 @@ export const signin = async (req, res) => {
   res.cookie("token", token, {
     // httpOnly: true, // Recomendado por seguridad para que el frontend no la lea con JS
     // secure: true, // Usar solo en producción con HTTPS
-    sameSite: "none", // Usar solo si frontend y backend están en dominios distintos con HTTPS
+    // sameSite: "none", // Usar solo si frontend y backend están en dominios distintos con HTTPS
     maxAge: 60 * 60 * 24 * 1000, // 1 day
   });
 
@@ -49,7 +49,7 @@ export const signup = async (req, res, next) => {
     res.cookie("token", token, {
       // httpOnly: true,
       // secure: true,
-      sameSite: "none",
+      // sameSite: "none",
       maxAge: 60 * 60 * 24 * 1000, // 1 day
     });
 
