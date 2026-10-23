@@ -31,11 +31,18 @@ html {
 }
 
 body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
     background: var(--surface);
     color: var(--ink);
     font-family: var(--font-stack);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+}
+
+body > main {
+    flex: 1;
 }
 
 a {

@@ -78,7 +78,7 @@
                 <div class="map-container-real">
                     <div id="map" role="application" aria-label="Mapa interactivo de San Rafael y la ruta"></div>
                 </div>
-                <p class="route-note">La ruta es vial y orientativa; no representa el recorrido de una línea de colectivo.</p>
+                <p class="route-note">Las paradas usan coordenadas actualmente cargadas y pueden ser referenciales. La ruta trazada es vial y no representa el recorrido de una línea de colectivo.</p>
             </section>
 
 
@@ -132,6 +132,7 @@
     const feedback = document.querySelector("#route-feedback");
     const map = L.map("map").setView([-34.6175, -68.3301], 14);
     const routeLayers = L.featureGroup().addTo(map);
+    const stopLayers = L.featureGroup().addTo(map);
     let activeSearch;
     let lastGeocodeRequest = 0;
 
@@ -139,6 +140,88 @@
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    function renderHomeStops() {
+        const transitData = window.sanRafaelTransitData;
+        if (!transitData) {
+            const status = document.querySelector(".map-status");
+            status.textContent = "Paradas no disponibles";
+            console.error("No se pudieron cargar las coordenadas y líneas de las paradas.");
+            return;
+        }
+
+        const locationsByCoordinates = new Map();
+        const locationByStopName = new Map();
+
+        Object.entries(transitData.stopCoordinates).forEach(([stopName, coordinates]) => {
+            const coordinateKey = coordinates.join(",");
+            let location = locationsByCoordinates.get(coordinateKey);
+            if (!location) {
+                location = { coordinates, stops: new Map() };
+                locationsByCoordinates.set(coordinateKey, location);
+            }
+            location.stops.set(stopName, new Set());
+            locationByStopName.set(stopName.trim().toLowerCase(), location);
+        });
+
+        Object.entries(transitData.scheduleSets).forEach(([line, daySets]) => {
+            Object.values(daySets).forEach((routes) => {
+                Object.values(routes).forEach((schedule) => {
+                    if (!Array.isArray(schedule.stops)) return;
+
+                    schedule.stops.forEach((stopName) => {
+                        const normalizedName = stopName.trim().toLowerCase();
+                        let location = locationByStopName.get(normalizedName);
+                        let matchedStopName = normalizedName;
+                        if (!location) {
+                            const match = Array.from(locationByStopName.entries()).find(([knownName]) =>
+                                knownName.includes(normalizedName) || normalizedName.includes(knownName)
+                            );
+                            if (match) {
+                                [matchedStopName, location] = match;
+                            }
+                        }
+                        if (!location) return;
+
+                        const stopLines = location.stops.get(
+                            Array.from(location.stops.keys()).find((name) => name.trim().toLowerCase() === matchedStopName)
+                        );
+                        if (stopLines) stopLines.add(line);
+                    });
+                });
+            });
+        });
+
+        locationsByCoordinates.forEach((location) => {
+            const stopNames = Array.from(location.stops.keys());
+            const lines = Array.from(new Set(
+                Array.from(location.stops.values()).flatMap((stopLines) => Array.from(stopLines))
+            )).sort();
+            const marker = L.circleMarker(location.coordinates, {
+                radius: 6,
+                color: "#ffffff",
+                weight: 2,
+                fillColor: "#2878a5",
+                fillOpacity: 0.95
+            });
+            const popup = document.createElement("div");
+            const name = document.createElement("strong");
+            name.textContent = stopNames.join(" / ");
+            const lineList = document.createElement("p");
+            lineList.textContent = lines.length
+                ? `Líneas: ${lines.join(", ")}`
+                : "No hay líneas asociadas en los datos cargados.";
+            popup.append(name, lineList);
+            marker.bindPopup(popup);
+            stopLayers.addLayer(marker);
+        });
+
+        const status = document.querySelector(".map-status");
+        status.textContent = `${locationsByCoordinates.size} ubicaciones · Mapa interactivo`;
+        if (stopLayers.getLayers().length) {
+            map.fitBounds(stopLayers.getBounds().pad(0.08), { maxZoom: 13 });
+        }
+    }
 
     function wait(milliseconds, signal) {
         if (milliseconds <= 0) {
@@ -276,7 +359,10 @@
         }
     });
 
-    window.addEventListener("load", () => map.invalidateSize());
+    window.addEventListener("load", () => {
+        renderHomeStops();
+        map.invalidateSize();
+    });
 </script>
 <script src="js/auth.js"></script>
 <script src="js/recorrido.js"></script>

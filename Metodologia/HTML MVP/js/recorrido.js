@@ -2655,6 +2655,8 @@ function getStopCoordinate(stopName, index, totalStops) {
     return [-34.6175 + Math.sin(angle) * 0.02, -68.3301 + Math.cos(angle) * 0.02];
 }
 
+window.sanRafaelTransitData = { stopCoordinates, scheduleSets };
+
 // ==========================================================================
 // GESTIÓN DEL MAPA LEAFLET Y TRAZADO VIAL
 // ==========================================================================
@@ -3052,11 +3054,11 @@ btnSubmitRoute?.addEventListener("click", () => {
     scheduleCard.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-departureSelect.addEventListener("change", () => {
+departureSelect?.addEventListener("change", () => {
     renderSelectedTrip();
 });
 
-lineSelect.addEventListener("change", () => {
+lineSelect?.addEventListener("change", () => {
     daySelect.value = "";
     populateRoutesForDay();
     scheduleCard.hidden = true;
@@ -3065,13 +3067,13 @@ lineSelect.addEventListener("change", () => {
     document.title = `${selectedLineLabel()} · Horarios y recorridos | San Rafael Movilidad`;
 });
 
-routeSelect.addEventListener("change", () => {
+routeSelect?.addEventListener("change", () => {
     if (!scheduleCard.hidden) {
         populateDepartures(currentSchedule());
     }
 });
 
-daySelect.addEventListener("change", () => {
+daySelect?.addEventListener("change", () => {
     populateRoutesForDay();
 });
 
