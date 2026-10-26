@@ -110,6 +110,17 @@ const mapa = document.getElementById('mapa');
 // Es const porque nunca lo reasignamos: solo lo usamos para dibujar.
 const lienzo = mapa.getContext('2d');
 
+// Tamaño del mapa en píxeles. El profe probó 800x600 y lo bajó a 320x240
+// porque se veía muy grande: si querés otro tamaño, cambiás solo estos dos.
+const ANCHO_MAPA = 320;
+const ALTO_MAPA = 240;
+
+// Imagen de fondo del mapa. Es const porque la variable no se reasigna:
+// solo se le asigna la ruta a la propiedad .src. El archivo mapa.jpg
+// tiene que estar en la carpeta media (y no ser muy pesado, por GitHub).
+const mapaBackground = new Image();
+mapaBackground.src = './media/mapa.jpg';
+
 // Aplicando el principio DRY (Don't Repeat Yourself):
 // Mapeo de cada tipo de ataque a su emoji, reutilizado en toda la app.
 const EMOJIS_ATAQUE = { punio: '👊', patada: '🦵', barrida: '👣' };
@@ -186,14 +197,6 @@ function seleccionarPersonajeJugador() {
 
     // Transición de vistas en la interfaz
     seccionSeleccionarPersonaje.style.display = 'none';
-    // Por ahora el combate queda en pausa: primero se recorre el mapa.
-    // (La versión completa con combate está guardada como v1.)
-    // seccionSeleccionarAtaque.style.display = 'block';
-    seccionVerMapa.style.display = 'flex';
-
-    // Cada 50 milisegundos se vuelve a ejecutar pintarPersonaje().
-    // Eso es lo que permite ver el movimiento como una animación.
-    intervalo = setInterval(pintarPersonaje, 50);
 
     // Selección aleatoria del rival: se elige un avatar al azar del array
     // (usando .length, tal como lo vimos con los arrays) y se fabrica
@@ -202,6 +205,15 @@ function seleccionarPersonajeJugador() {
     const avatarEnemigo = avatares[random];
     enemigo = new Personaje(avatarEnemigo.nombre, avatarEnemigo.imagen);
     spanPersonajeEnemigo.innerHTML = enemigo.nombre;
+
+    // El mapa se muestra y se arranca AL FINAL, cuando "jugador" y
+    // "enemigo" ya existen. Si lo hiciéramos antes, el mapa intentaría
+    // usar variables todavía vacías (undefined): es el mismo problema
+    // del orden de ejecución que vimos antes.
+    // Por ahora el combate queda en pausa (la versión completa está en v1):
+    // seccionSeleccionarAtaque.style.display = 'block';
+    seccionVerMapa.style.display = 'flex';
+    iniciarMapa();
 }
 
 // === LOGICA DEL ATAQUE ===
@@ -275,14 +287,39 @@ function combate() {
     }
 }
 
-// === DIBUJO DEL PERSONAJE EN EL MAPA ===
-// Se ejecuta cada 50 ms (por el setInterval). En cada "tic":
+// === INICIO DEL MAPA ===
+// Agrupa todo lo que hay que preparar cuando el mapa empieza a usarse.
+// Se llama una sola vez, desde seleccionarPersonajeJugador().
+function iniciarMapa() {
+    // Tamaño del canvas (al cambiarlo, el canvas se borra: por eso va primero)
+    mapa.width = ANCHO_MAPA;
+    mapa.height = ALTO_MAPA;
+
+    // Cada 50 milisegundos se vuelve a ejecutar pintarCanvas().
+    // Eso es lo que permite ver el movimiento como una animación.
+    intervalo = setInterval(pintarCanvas, 50);
+
+    // Eventos del teclado. Se escuchan en "window" (toda la ventana),
+    // porque el teclado no está atado a ningún botón en particular.
+    window.addEventListener('keydown', sePresionoUnaTecla);   // al apretar una tecla
+    window.addEventListener('keyup', detenerMovimiento);      // al soltarla
+}
+
+// === DIBUJO DEL MAPA COMPLETO ===
+// Ya no pinta solo al personaje: pinta TODO el canvas, por eso cambió de
+// nombre. Se ejecuta cada 50 ms (por el setInterval). En cada "tic":
 // 1) actualiza la posición sumando la velocidad (si es 0, no se mueve),
-// 2) borra todo el canvas, 3) dibuja la imagen en la nueva posición.
-function pintarPersonaje() {
+// 2) borra el canvas, 3) dibuja el fondo, 4) dibuja al personaje encima.
+function pintarCanvas() {
     jugador.x = jugador.x + jugador.velocidadX;
     jugador.y = jugador.y + jugador.velocidadY;
     lienzo.clearRect(0, 0, mapa.width, mapa.height);
+
+    // El orden importa: lo que se dibuja después queda ENCIMA.
+    // Primero el fondo, desde la esquina (0,0) y cubriendo todo el canvas.
+    lienzo.drawImage(mapaBackground, 0, 0, mapa.width, mapa.height);
+
+    // Después el personaje, en su posición actual.
     lienzo.drawImage(
         jugador.mapaFoto,   // la imagen a dibujar
         jugador.x,          // posición en x
@@ -292,9 +329,39 @@ function pintarPersonaje() {
     );
 }
 
+// === TECLADO ===
+// Cada vez que se aprieta una tecla, el navegador crea un "evento" (un
+// objeto con información) y se lo pasa a esta función como parámetro.
+// event.key dice qué tecla fue: 'ArrowUp', 'ArrowDown', etc.
+function sePresionoUnaTecla(event) {
+    // Las flechas, por defecto, hacen scroll en la página. Lo anulamos
+    // solo para ellas, así al jugar la pantalla no se mueve.
+    if (event.key.startsWith('Arrow')) {
+        event.preventDefault();
+    }
+
+    switch (event.key) {
+        case 'ArrowUp':
+            moverArriba();
+            break;
+        case 'ArrowDown':
+            moverAbajo();
+            break;
+        case 'ArrowLeft':
+            moverIzquierda();
+            break;
+        case 'ArrowRight':
+            moverDerecha();
+            break;
+        default:
+            break;  // cualquier otra tecla se ignora
+    }
+}
+
 // === MOVIMIENTO ===
 // Estas funciones NO dibujan: solo cambian la velocidad. Quien mueve
-// de verdad al personaje es pintarPersonaje(), que se repite sola.
+// de verdad al personaje es pintarCanvas(), que se repite sola.
+// Las usan tanto los botones del HTML como las flechas del teclado.
 // En el canvas, x crece hacia la derecha e y crece hacia ABAJO.
 function moverDerecha() {
     jugador.velocidadX = 5;
@@ -312,7 +379,7 @@ function moverArriba() {
     jugador.velocidadY = -5;
 }
 
-// Al soltar el botón la velocidad vuelve a 0 y el personaje se frena.
+// Al soltar el botón (o la tecla) la velocidad vuelve a 0 y el personaje se frena.
 function detenerMovimiento() {
     jugador.velocidadX = 0;
     jugador.velocidadY = 0;
