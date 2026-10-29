@@ -1,391 +1,678 @@
-// === CANTIDAD DE VIDAS INICIALES ===
-// Constante compartida por todos los personajes (jugador y enemigo).
+// ==================== CONFIGURACIÓN Y PERSONAJES ====================
 const VIDAS_INICIALES = 3;
+const VELOCIDAD_JUGADOR = 5;
+const VELOCIDAD_ENEMIGO = 1.8;
 
-// === CLASE PERSONAJE (Programación Orientada a Objetos) ===
-// Una clase es el "molde" o plano: describe qué datos (propiedades) y
-// qué acciones (métodos) va a tener CADA personaje que creemos a partir
-// de ella. No es un personaje en sí — es la receta para fabricarlos.
+const EMOJIS_ATAQUE = {
+    punio: '👊',
+    patada: '🦵',
+    barrida: '👣'
+};
+
+// ==================== CLASE PERSONAJE ====================
 class Personaje {
-    // El constructor se ejecuta automáticamente cada vez que hacemos
-    // "new Personaje(...)". Acá definimos qué necesita cada personaje
-    // para "nacer", y se lo guardamos con "this." (this = este objeto puntual).
     constructor(nombre, imagen) {
-        this.nombre = nombre;           // Propiedad: nombre del personaje
-        this.imagen = imagen;           // Propiedad: ruta de su imagen
-        this.vidas = VIDAS_INICIALES;   // Propiedad: arranca con las vidas iniciales
-        this.ataque = null;             // Propiedad: todavía no eligió ataque
+        this.nombre = nombre;
+        this.imagen = imagen;
+        this.vidas = VIDAS_INICIALES;
+        this.ataque = null;
+        this.x = 0;
+        this.y = 0;
+        this.ancho = 65;
+        this.alto = 65;
 
-        // --- Datos para dibujar al personaje en el mapa (canvas) ---
-        this.x = 20;                    // Posición horizontal inicial (0 = borde izquierdo)
-        this.y = 30;                    // Posición vertical inicial (0 = borde de arriba)
-        this.ancho = 80;                // Ancho con el que se dibuja
-        this.alto = 80;                 // Alto con el que se dibuja
-        this.mapaFoto = new Image();    // Objeto imagen que el canvas sabe dibujar
-        this.mapaFoto.src = imagen;     // Le decimos qué archivo cargar
-        this.velocidadX = 0;            // Cuánto se mueve en x por cada "tic" (0 = quieto)
-        this.velocidadY = 0;            // Cuánto se mueve en y por cada "tic" (0 = quieto)
-    }
-
-    // Métodos: acciones que puede "hacer" un personaje.
-    elegirAtaque(tipo) {
-        this.ataque = tipo;
+        this.mapaFoto = new Image();
+        this.mapaFoto.src = imagen;
     }
 
     recibirDano() {
-        this.vidas--;
+        this.vidas = Math.max(0, this.vidas - 1);
     }
 
     estaDerrotado() {
         return this.vidas <= 0;
     }
 
-    // Devuelve los corazones ya armados según sus vidas actuales.
     corazones() {
-        return '❤️'.repeat(Math.max(0, this.vidas));
+        return '❤️'.repeat(Math.max(0, this.vidas)) || '🖤';
+    }
+
+    pintarEnMapa() {
+        if (this.mapaFoto.complete && this.mapaFoto.naturalWidth > 0) {
+            lienzo.drawImage(
+                this.mapaFoto,
+                this.x,
+                this.y,
+                this.ancho,
+                this.alto
+            );
+        } else {
+            lienzo.fillStyle = this === jugador ? '#2563eb' : '#dc2626';
+            lienzo.beginPath();
+            lienzo.arc(
+                this.x + this.ancho / 2,
+                this.y + this.alto / 2,
+                this.ancho / 2,
+                0,
+                Math.PI * 2
+            );
+            lienzo.fill();
+
+            lienzo.fillStyle = '#fff';
+            lienzo.font = '12px sans-serif';
+            lienzo.textAlign = 'center';
+            lienzo.fillText(
+                this.nombre,
+                this.x + this.ancho / 2,
+                this.y + this.alto + 14
+            );
+        }
     }
 }
 
-// === INSTANCIAS DE CADA PERSONAJE ===
-// Acá sí se usa "new Personaje(...)": creamos, uno por uno, cada
-// personaje disponible como un objeto real (con sus propias vidas,
-// aunque todavía no estén jugando ninguna partida).
-const zuko = new Personaje('Zuko', './media/zuko.png');
-const katara = new Personaje('Katara', './media/katara.png');
-const aang = new Personaje('Aang', './media/aang.png');
-const toph = new Personaje('Toph', './media/toph.png');
-const sokka = new Personaje('Sokka', './media/sokka.png'); // PERSONAJE CREADO
-const azula = new Personaje('Azula', './media/azula.jpg'); // PERSONAJE CREADO (corregido a .jpg, igual que el archivo real)
-const suki = new Personaje('Suki', './media/suki.jpg'); // Nuevo personaje
+// ==================== PERSONAJES DISPONIBLES ====================
+const avatares = [
+    new Personaje('Zuko', './media/zuko.png'),
+    new Personaje('Katara', './media/katara.png'),
+    new Personaje('Aang', './media/aang.png'),
+    new Personaje('Toph', './media/toph.png'),
+    new Personaje('Sokka', './media/sokka.png'),
+    new Personaje('Azula', './media/azula.jpg'),
+    new Personaje('Suki', './media/suki.jpg')
+];
 
-// === ARREGLO CON TODOS LOS PERSONAJES DISPONIBLES ===
-// Se crea vacío y se va llenando con .push(): si mañana agregás un
-// personaje nuevo, solo hace falta crearlo arriba (con "new") y
-// agregarlo acá con push — el resto del juego no se toca.
-const avatares = [];
-avatares.push(zuko, katara, aang, toph, sokka, azula, suki);
+// ==================== ELEMENTOS HTML ====================
+const $ = id => document.getElementById(id);
 
-// === VARIABLES Y CONSTANTES ===
-// Estas SÍ cambian durante la partida: van a apuntar a los objetos
-// Personaje que el jugador y la máquina eligieron para jugar esta ronda.
-let jugador;
-let enemigo;
+const contenedorTarjetas = $('contenedorTarjetas');
+const botonPersonaje = $('boton-personaje');
+const botonReiniciar = $('boton-reiniciar');
 
-// Guarda el "reloj" que redibuja el mapa cada 50 ms (lo crea setInterval).
-// Es "let" porque recién se le asigna un valor cuando se elige personaje.
-let intervalo;
+const seccionSeleccionarPersonaje = $('seleccionar-personaje');
+const seccionVerMapa = $('ver-mapa');
+const seccionSeleccionarAtaque = $('seleccionar-ataque');
+const seccionReiniciar = $('reiniciar');
 
-// Referencias globales del DOM: se buscan una sola vez, arriba de todo,
-// y se reutilizan en todas las funciones. Como se asignan en la misma línea
-// donde se declaran, pueden ser "const" (requiere que el HTML ya exista
-// al ejecutarse esta línea: script al final del <body> o con "defer").
-const botonPunio = document.getElementById('boton-punio');
-const botonPatada = document.getElementById('boton-patada');
-const botonBarrida = document.getElementById('boton-barrida');
-const botonPersonajeJugador = document.getElementById('boton-personaje');
-const botonReiniciar = document.getElementById('boton-reiniciar');
-
-const spanPersonajeJugador = document.getElementById('personaje-jugador');
-const spanPersonajeEnemigo = document.getElementById('personaje-enemigo');
-const spanVidasJugador = document.getElementById('vidas-jugador');
-const spanVidasEnemigo = document.getElementById('vidas-enemigo');
-
-const seccionSeleccionarPersonaje = document.getElementById('seleccionar-personaje');
-const seccionSeleccionarAtaque = document.getElementById('seleccionar-ataque');
-const seccionReiniciar = document.getElementById('reiniciar');
-
-// Este SÍ se puede capturar acá arriba, junto a los demás: el <div>
-// vacío "contenedorTarjetas" ya existe en el HTML desde que carga la
-// página. Lo que NO existe todavía son los inputs de cada personaje:
-// esos los vamos a crear nosotros mismos más abajo, con forEach.
-const contenedorTarjetas = document.getElementById('contenedorTarjetas');
-
-// Sección y canvas del mapa: ambos están escritos a mano en el HTML,
-// por eso se pueden capturar acá arriba sin problema.
-const seccionVerMapa = document.getElementById('ver-mapa');
-const mapa = document.getElementById('mapa');
-
-// El "lienzo" es la herramienta con la que se dibuja dentro del canvas.
-// "2d" = trabajamos en dos dimensiones (x horizontal, y vertical).
-// Es const porque nunca lo reasignamos: solo lo usamos para dibujar.
+const mapa = $('mapa');
 const lienzo = mapa.getContext('2d');
 
-// Tamaño del mapa en píxeles. El profe probó 800x600 y lo bajó a 320x240
-// porque se veía muy grande: si querés otro tamaño, cambiás solo estos dos.
-const ANCHO_MAPA = 320;
-const ALTO_MAPA = 240;
-
-// Imagen de fondo del mapa. Es const porque la variable no se reasigna:
-// solo se le asigna la ruta a la propiedad .src. El archivo mapa.jpg
-// tiene que estar en la carpeta media (y no ser muy pesado, por GitHub).
 const mapaBackground = new Image();
-mapaBackground.src = './media/mapa.jpg';
+mapaBackground.src = './media/mapa.png';
 
-// Aplicando el principio DRY (Don't Repeat Yourself):
-// Mapeo de cada tipo de ataque a su emoji, reutilizado en toda la app.
-const EMOJIS_ATAQUE = { punio: '👊', patada: '🦵', barrida: '👣' };
+// ==================== VARIABLES DEL JUEGO ====================
+let jugador = null;
+let enemigo = null;
 
-// === RENDERIZADO DINÁMICO DE LAS TARJETAS DE PERSONAJES ===
-// Recorre el array "avatares" (un elemento por vuelta, en orden) y arma
-// el HTML de cada tarjeta con un template literal (backticks). Por cada
-// avatar, concatena (+=) su tarjeta dentro de "contenedorTarjetas".
-// Esto reemplaza lo que antes escribías a mano en el HTML: agregar un
-// personaje nuevo ya no requiere tocar ningún archivo HTML.
+let intervaloMapa = null;
+let intervaloCombate = null;
+
+let combateEnCurso = false;
+let partidaTerminada = false;
+let ronda = 0;
+
+const teclas = new Set();
+
+// ==================== NÚMERO ALEATORIO ====================
+function numeroAleatorio(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// ==================== SELECCIÓN DE PERSONAJE ====================
 function renderizarTarjetasPersonajes() {
-    avatares.forEach((avatar) => {
-        const tarjetaHTML = `
-            <div class="personaje">
-                <img src="${avatar.imagen}" alt="${avatar.nombre}">
-                <label for="${avatar.nombre}">${avatar.nombre}</label>
-                <input type="radio" name="personaje" id="${avatar.nombre}" value="${avatar.nombre}">
-            </div>
+    contenedorTarjetas.innerHTML = '';
+
+    avatares.forEach(avatar => {
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'personaje';
+
+        tarjeta.innerHTML = `
+            <img src="${avatar.imagen}" alt="${avatar.nombre}">
+            <label>${avatar.nombre}</label>
+            <input type="radio" name="personaje"
+                value="${avatar.nombre}"
+                aria-label="Elegir ${avatar.nombre}">
         `;
-        contenedorTarjetas.innerHTML += tarjetaHTML;
+
+        const radio = tarjeta.querySelector('input');
+
+        tarjeta.addEventListener('click', () => {
+            radio.checked = true;
+
+            document.querySelectorAll('.personaje').forEach(t => {
+                t.classList.remove('seleccionado');
+            });
+
+            tarjeta.classList.add('seleccionado');
+        });
+
+        contenedorTarjetas.appendChild(tarjeta);
     });
 }
 
-// === FUNCIÓN INICIAL ===
-function iniciarJuego() {
-    // Primero generamos las tarjetas dinámicamente. Tiene que pasar ANTES
-    // de que cualquier otra parte del código intente buscar los inputs
-    // de personaje — si alguien los buscara arriba, junto a los demás
-    // "const" globales, estarían vacíos porque todavía no se crearon
-    // (ese es justamente el bug de "declaración lenta" que vimos).
-    renderizarTarjetasPersonajes();
+function seleccionarPersonaje() {
+    const elegido = document.querySelector(
+        'input[name="personaje"]:checked'
+    );
 
-    // Estado inicial de la interfaz
-    seccionSeleccionarAtaque.style.display = 'none';
-    seccionReiniciar.style.display = 'none';
-    seccionVerMapa.style.display = 'none';
-
-    // Asignación de event listeners mediante funciones flecha
-    botonPunio.addEventListener('click', () => ataque('punio'));
-    botonPatada.addEventListener('click', () => ataque('patada'));
-    botonBarrida.addEventListener('click', () => ataque('barrida'));
-    botonPersonajeJugador.addEventListener('click', seleccionarPersonajeJugador);
-    botonReiniciar.addEventListener('click', () => location.reload());
-}
-
-// === SELECCIÓN DE PERSONAJES ===
-function seleccionarPersonajeJugador() {
-    // Importante: estos inputs se buscan ACÁ DENTRO, cada vez que se
-    // ejecuta la función (es decir, cuando el usuario hace click en
-    // "Seleccionar") — nunca arriba, junto a los const globales. Para
-    // ese momento, renderizarTarjetasPersonajes() ya se ejecutó y los
-    // inputs ya existen en el DOM.
-    const inputs = document.querySelectorAll('input[name="personaje"]');
-    let nombreElegido = null;
-    // Recorre los inputs para encontrar cuál fue seleccionado
-    inputs.forEach(input => {
-        if (input.checked) {
-            nombreElegido = input.value;
-        }
-    });
-
-    if (!nombreElegido) {
-        alert('Por favor seleccioná un personaje');
+    if (!elegido) {
+        alert('Por favor, elegí un personaje.');
         return;
     }
 
-    // Busca en el array "avatares" el objeto del personaje elegido, y con
-    // su nombre e imagen fabrica un objeto Personaje NUEVO (con "new"):
-    // así "jugador" no comparte instancia con el avatar guardado en el
-    // array ni con el enemigo, aunque hayan elegido el mismo personaje.
-    const avatarJugador = avatares.find(avatar => avatar.nombre === nombreElegido);
-    jugador = new Personaje(avatarJugador.nombre, avatarJugador.imagen);
-    spanPersonajeJugador.innerHTML = jugador.nombre;
+    const avatarElegido = avatares.find(
+        a => a.nombre === elegido.value
+    );
 
-    // Transición de vistas en la interfaz
+    jugador = new Personaje(
+        avatarElegido.nombre,
+        avatarElegido.imagen
+    );
+
+    const opciones = avatares.filter(
+        a => a.nombre !== jugador.nombre
+    );
+
+    const elegidoEnemigo =
+        opciones[numeroAleatorio(0, opciones.length - 1)];
+
+    enemigo = new Personaje(
+        elegidoEnemigo.nombre,
+        elegidoEnemigo.imagen
+    );
+
+    $('personaje-jugador').textContent = jugador.nombre;
+    $('personaje-enemigo').textContent = enemigo.nombre;
+
+    $('vidas-jugador').textContent = jugador.corazones();
+    $('vidas-enemigo').textContent = enemigo.corazones();
+
     seccionSeleccionarPersonaje.style.display = 'none';
+    seccionVerMapa.style.display = 'block';
 
-    // Selección aleatoria del rival: se elige un avatar al azar del array
-    // (usando .length, tal como lo vimos con los arrays) y se fabrica
-    // OTRO objeto Personaje nuevo e independiente para el enemigo.
-    const random = Math.floor(Math.random() * avatares.length);
-    const avatarEnemigo = avatares[random];
-    enemigo = new Personaje(avatarEnemigo.nombre, avatarEnemigo.imagen);
-    spanPersonajeEnemigo.innerHTML = enemigo.nombre;
+    $('estado-mapa').textContent =
+        `Encontrá a ${enemigo.nombre}. ¡Cuando se toquen comenzará la pelea!`;
 
-    // El mapa se muestra y se arranca AL FINAL, cuando "jugador" y
-    // "enemigo" ya existen. Si lo hiciéramos antes, el mapa intentaría
-    // usar variables todavía vacías (undefined): es el mismo problema
-    // del orden de ejecución que vimos antes.
-    // Por ahora el combate queda en pausa (la versión completa está en v1):
-    // seccionSeleccionarAtaque.style.display = 'block';
-    seccionVerMapa.style.display = 'flex';
     iniciarMapa();
+
+    seccionVerMapa.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
 }
 
-// === LOGICA DEL ATAQUE ===
-function ataque(tipoAtaque) {
-    // En vez de guardar el ataque en una variable suelta, se lo pedimos
-    // al objeto: es EL PERSONAJE quien "elige su ataque" (método de la clase).
-    jugador.elegirAtaque(tipoAtaque);
-
-    // Generación aleatoria del ataque enemigo, reutilizando las claves de EMOJIS_ATAQUE (DRY)
-    const opciones = Object.keys(EMOJIS_ATAQUE);
-    enemigo.elegirAtaque(opciones[Math.floor(Math.random() * opciones.length)]);
-
-    combate();
-}
-
-// === RESOLUCIÓN DEL COMBATE Y ANIMACIONES ===
-function combate() {
-    const visuJugador = document.getElementById('ataque-visu-jugador');
-    const visuEnemigo = document.getElementById('ataque-visu-enemigo');
-    const banner = document.getElementById('banner-resultado');
-    const tarjetaJugador = document.getElementById('tarjeta-jugador');
-    const tarjetaEnemigo = document.getElementById('tarjeta-enemigo');
-
-    // Mapeo dinámico visual consumiendo el objeto EMOJIS_ATAQUE (DRY)
-    visuJugador.innerHTML = EMOJIS_ATAQUE[jugador.ataque];
-    visuEnemigo.innerHTML = EMOJIS_ATAQUE[enemigo.ataque];
-
-    // Despliegue de animación de choque
-    visuJugador.classList.add('animar-choque');
-    visuEnemigo.classList.add('animar-choque');
-    setTimeout(() => {
-        visuJugador.classList.remove('animar-choque');
-        visuEnemigo.classList.remove('animar-choque');
-    }, 400);
-
-    banner.className = '';
-
-    // Evaluación del ganador de la ronda aplicando reglas condicionales
-    if (jugador.ataque === enemigo.ataque) {
-        banner.innerHTML = '¡EMPATE!';
-        banner.classList.add('banner-empate');
-    } else if (
-        (jugador.ataque === 'punio' && enemigo.ataque === 'barrida') ||
-        (jugador.ataque === 'patada' && enemigo.ataque === 'punio') ||
-        (jugador.ataque === 'barrida' && enemigo.ataque === 'patada')
-    ) {
-        enemigo.recibirDano();
-        banner.innerHTML = '¡ASALTO GANADO!';
-        banner.classList.add('banner-ganaste');
-        tarjetaEnemigo.classList.add('animar-dano');
-        setTimeout(() => tarjetaEnemigo.classList.remove('animar-dano'), 300);
-    } else {
-        jugador.recibirDano();
-        banner.innerHTML = '¡ASALTO PERDIDO!';
-        banner.classList.add('banner-perdiste');
-        tarjetaJugador.classList.add('animar-dano');
-        setTimeout(() => tarjetaJugador.classList.remove('animar-dano'), 300);
-    }
-
-    // Actualización de la representación visual de vidas usando el método corazones() del objeto (DRY)
-    spanVidasJugador.innerHTML = jugador.corazones();
-    spanVidasEnemigo.innerHTML = enemigo.corazones();
-
-    // Comprobación de fin de juego y desactivación de controles
-    if (jugador.estaDerrotado() || enemigo.estaDerrotado()) {
-        banner.innerHTML = jugador.estaDerrotado() ? '💀 ¡Juego Terminado: Perdiste!' : '🎉 ¡Victoria!';
-        botonPunio.disabled = true;
-        botonPatada.disabled = true;
-        botonBarrida.disabled = true;
-        seccionReiniciar.style.display = 'block';
-    }
-}
-
-// === INICIO DEL MAPA ===
-// Agrupa todo lo que hay que preparar cuando el mapa empieza a usarse.
-// Se llama una sola vez, desde seleccionarPersonajeJugador().
+// ==================== INICIAR MAPA ====================
 function iniciarMapa() {
-    // Tamaño del canvas (al cambiarlo, el canvas se borra: por eso va primero)
-    mapa.width = ANCHO_MAPA;
-    mapa.height = ALTO_MAPA;
+    mapa.width = 800;
+    mapa.height = 500;
 
-    // Cada 50 milisegundos se vuelve a ejecutar pintarCanvas().
-    // Eso es lo que permite ver el movimiento como una animación.
-    intervalo = setInterval(pintarCanvas, 50);
+    jugador.x = 35;
+    jugador.y = (mapa.height - jugador.alto) / 2;
 
-    // Eventos del teclado. Se escuchan en "window" (toda la ventana),
-    // porque el teclado no está atado a ningún botón en particular.
-    window.addEventListener('keydown', sePresionoUnaTecla);   // al apretar una tecla
-    window.addEventListener('keyup', detenerMovimiento);      // al soltarla
-}
+    enemigo.x = mapa.width - enemigo.ancho - 35;
+    enemigo.y = numeroAleatorio(
+        35,
+        mapa.height - enemigo.alto - 35
+    );
 
-// === DIBUJO DEL MAPA COMPLETO ===
-// Ya no pinta solo al personaje: pinta TODO el canvas, por eso cambió de
-// nombre. Se ejecuta cada 50 ms (por el setInterval). En cada "tic":
-// 1) actualiza la posición sumando la velocidad (si es 0, no se mueve),
-// 2) borra el canvas, 3) dibuja el fondo, 4) dibuja al personaje encima.
-function pintarCanvas() {
-    jugador.x = jugador.x + jugador.velocidadX;
-    jugador.y = jugador.y + jugador.velocidadY;
-    lienzo.clearRect(0, 0, mapa.width, mapa.height);
+    combateEnCurso = false;
+    partidaTerminada = false;
+    ronda = 0;
+    teclas.clear();
 
-    // El orden importa: lo que se dibuja después queda ENCIMA.
-    // Primero el fondo, desde la esquina (0,0) y cubriendo todo el canvas.
-    lienzo.drawImage(mapaBackground, 0, 0, mapa.width, mapa.height);
+    if (intervaloMapa) {
+        clearInterval(intervaloMapa);
+    }
 
-    // Después el personaje, en su posición actual.
-    lienzo.drawImage(
-        jugador.mapaFoto,   // la imagen a dibujar
-        jugador.x,          // posición en x
-        jugador.y,          // posición en y
-        jugador.ancho,      // ancho con el que se dibuja
-        jugador.alto        // alto con el que se dibuja
+    intervaloMapa = setInterval(
+        actualizarMapa,
+        1000 / 30
     );
 }
 
-// === TECLADO ===
-// Cada vez que se aprieta una tecla, el navegador crea un "evento" (un
-// objeto con información) y se lo pasa a esta función como parámetro.
-// event.key dice qué tecla fue: 'ArrowUp', 'ArrowDown', etc.
-function sePresionoUnaTecla(event) {
-    // Las flechas, por defecto, hacen scroll en la página. Lo anulamos
-    // solo para ellas, así al jugar la pantalla no se mueve.
-    if (event.key.startsWith('Arrow')) {
+// ==================== MOVIMIENTO DEL JUGADOR ====================
+function moverJugador() {
+    if (!jugador || combateEnCurso || partidaTerminada) {
+        return;
+    }
+
+    let dx = 0;
+    let dy = 0;
+
+    if (teclas.has('ArrowLeft') || teclas.has('a')) dx--;
+    if (teclas.has('ArrowRight') || teclas.has('d')) dx++;
+    if (teclas.has('ArrowUp') || teclas.has('w')) dy--;
+    if (teclas.has('ArrowDown') || teclas.has('s')) dy++;
+
+    // Evitar que el movimiento diagonal sea más rápido
+    if (dx !== 0 && dy !== 0) {
+        dx *= Math.SQRT1_2;
+        dy *= Math.SQRT1_2;
+    }
+
+    jugador.x = Math.max(
+        0,
+        Math.min(
+            mapa.width - jugador.ancho,
+            jugador.x + dx * VELOCIDAD_JUGADOR
+        )
+    );
+
+    jugador.y = Math.max(
+        0,
+        Math.min(
+            mapa.height - jugador.alto,
+            jugador.y + dy * VELOCIDAD_JUGADOR
+        )
+    );
+}
+
+// ==================== ENEMIGO QUE PERSIGUE ====================
+function moverEnemigo() {
+    if (combateEnCurso || partidaTerminada) return;
+
+    const jx = jugador.x + jugador.ancho / 2;
+    const jy = jugador.y + jugador.alto / 2;
+
+    const ex = enemigo.x + enemigo.ancho / 2;
+    const ey = enemigo.y + enemigo.alto / 2;
+
+    const dx = jx - ex;
+    const dy = jy - ey;
+
+    const distancia = Math.hypot(dx, dy);
+
+    if (distancia > 0) {
+        enemigo.x +=
+            (dx / distancia) * VELOCIDAD_ENEMIGO;
+
+        enemigo.y +=
+            (dy / distancia) * VELOCIDAD_ENEMIGO;
+    }
+}
+
+// ==================== DETECTAR CONTACTO ====================
+function personajesSeTocan() {
+    return (
+        jugador.x < enemigo.x + enemigo.ancho &&
+        jugador.x + jugador.ancho > enemigo.x &&
+        jugador.y < enemigo.y + enemigo.alto &&
+        jugador.y + jugador.alto > enemigo.y
+    );
+}
+
+// ==================== DIBUJAR ARENA ====================
+function dibujarArena() {
+    lienzo.clearRect(0, 0, mapa.width, mapa.height);
+
+    if (
+        mapaBackground.complete &&
+        mapaBackground.naturalWidth > 0
+    ) {
+        lienzo.drawImage(
+            mapaBackground,
+            0,
+            0,
+            mapa.width,
+            mapa.height
+        );
+    } else {
+        // Fondo alternativo si no se encuentra la imagen
+        lienzo.fillStyle = '#7c8797';
+        lienzo.fillRect(0, 0, mapa.width, mapa.height);
+
+        lienzo.fillStyle = '#64748b';
+        lienzo.beginPath();
+        lienzo.ellipse(
+            mapa.width / 2,
+            mapa.height / 2,
+            230,
+            170,
+            0,
+            0,
+            Math.PI * 2
+        );
+        lienzo.fill();
+
+        lienzo.strokeStyle = '#f59e0b';
+        lienzo.lineWidth = 5;
+        lienzo.stroke();
+
+        lienzo.fillStyle = 'white';
+        lienzo.font = 'bold 22px sans-serif';
+        lienzo.textAlign = 'center';
+        lienzo.fillText(
+            'ARENA DEL AVATAR',
+            mapa.width / 2,
+            45
+        );
+    }
+}
+
+// ==================== ACTUALIZAR MAPA ====================
+function actualizarMapa() {
+    if (!jugador || !enemigo) return;
+
+    moverJugador();
+    moverEnemigo();
+
+    dibujarArena();
+
+    enemigo.pintarEnMapa();
+    jugador.pintarEnMapa();
+
+    // Si se tocan, comienza la pelea automáticamente
+    if (
+        !combateEnCurso &&
+        !partidaTerminada &&
+        personajesSeTocan()
+    ) {
+        iniciarCombateMapa();
+    }
+}
+
+// ==================== CONTROLES DEL TECLADO ====================
+window.addEventListener('keydown', event => {
+    const permitidas = [
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        'w',
+        'a',
+        's',
+        'd'
+    ];
+
+    if (permitidas.includes(event.key)) {
         event.preventDefault();
+
+        if (!combateEnCurso && !partidaTerminada) {
+            teclas.add(event.key);
+        }
+    }
+});
+
+window.addEventListener('keyup', event => {
+    teclas.delete(event.key);
+});
+
+window.addEventListener('blur', () => {
+    teclas.clear();
+});
+
+// ==================== BOTONES DE MOVIMIENTO ====================
+function configurarBotonesMovimiento() {
+    document.querySelectorAll('.boton-movimiento').forEach(boton => {
+        const direccion = boton.dataset.direccion;
+
+        const teclaPorDireccion = {
+            arriba: 'ArrowUp',
+            abajo: 'ArrowDown',
+            izquierda: 'ArrowLeft',
+            derecha: 'ArrowRight'
+        };
+
+        const presionar = event => {
+            event.preventDefault();
+
+            if (!combateEnCurso && !partidaTerminada) {
+                teclas.add(teclaPorDireccion[direccion]);
+            }
+        };
+
+        const soltar = event => {
+            event.preventDefault();
+            teclas.delete(teclaPorDireccion[direccion]);
+        };
+
+        boton.addEventListener('pointerdown', presionar);
+        boton.addEventListener('pointerup', soltar);
+        boton.addEventListener('pointerleave', soltar);
+        boton.addEventListener('pointercancel', soltar);
+    });
+}
+
+// ==================== COMIENZO DEL COMBATE ====================
+function iniciarCombateMapa() {
+    if (combateEnCurso || partidaTerminada) return;
+
+    combateEnCurso = true;
+    teclas.clear();
+
+    $('estado-mapa').textContent =
+        '⚔️ ¡Contacto! El combate ya comenzó.';
+
+    seccionSeleccionarAtaque.style.display = 'block';
+
+    $('banner-resultado').className = '';
+    $('banner-resultado').textContent =
+        '⚔️ ¡COMIENZA EL DUELO!';
+
+    $('contador-ronda').textContent =
+        'Cada segundo se juega una ronda automática.';
+
+    seccionSeleccionarAtaque.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+
+    intervaloCombate = setInterval(() => {
+        if (partidaTerminada) {
+            clearInterval(intervaloCombate);
+            return;
+        }
+
+        ronda++;
+
+        const ataques = Object.keys(EMOJIS_ATAQUE);
+
+        jugador.ataque = ataques[
+            numeroAleatorio(0, ataques.length - 1)
+        ];
+
+        enemigo.ataque = ataques[
+            numeroAleatorio(0, ataques.length - 1)
+        ];
+
+        resolverCombate();
+    }, 1200);
+}
+
+// ==================== RESOLVER ATAQUES ====================
+function resolverCombate() {
+    const visorJugador = $('ataque-visu-jugador');
+    const visorEnemigo = $('ataque-visu-enemigo');
+    const banner = $('banner-resultado');
+
+    const tarjetaJugador = $('tarjeta-jugador');
+    const tarjetaEnemigo = $('tarjeta-enemigo');
+
+    visorJugador.textContent =
+        EMOJIS_ATAQUE[jugador.ataque];
+
+    visorEnemigo.textContent =
+        EMOJIS_ATAQUE[enemigo.ataque];
+
+    visorJugador.classList.remove('animar-choque');
+    visorEnemigo.classList.remove('animar-choque');
+
+    void visorJugador.offsetWidth;
+
+    visorJugador.classList.add('animar-choque');
+    visorEnemigo.classList.add('animar-choque');
+
+    banner.className = '';
+
+    // EMPATE
+    if (jugador.ataque === enemigo.ataque) {
+        banner.textContent =
+            `Ronda ${ronda}: ¡Empate! Nadie pierde una vida.`;
+
+        banner.classList.add('banner-empate');
     }
 
-    switch (event.key) {
-        case 'ArrowUp':
-            moverArriba();
-            break;
-        case 'ArrowDown':
-            moverAbajo();
-            break;
-        case 'ArrowLeft':
-            moverIzquierda();
-            break;
-        case 'ArrowRight':
-            moverDerecha();
-            break;
-        default:
-            break;  // cualquier otra tecla se ignora
+    // GANA EL JUGADOR
+    else if (
+        (jugador.ataque === 'punio' &&
+            enemigo.ataque === 'barrida') ||
+
+        (jugador.ataque === 'patada' &&
+            enemigo.ataque === 'punio') ||
+
+        (jugador.ataque === 'barrida' &&
+            enemigo.ataque === 'patada')
+    ) {
+        enemigo.recibirDano();
+
+        banner.textContent =
+            `Ronda ${ronda}: ¡${jugador.nombre} gana y le quita una vida a ${enemigo.nombre}!`;
+
+        banner.classList.add('banner-ganaste');
+
+        tarjetaEnemigo.classList.remove('animar-dano');
+        void tarjetaEnemigo.offsetWidth;
+        tarjetaEnemigo.classList.add('animar-dano');
+    }
+
+    // GANA EL ENEMIGO
+    else {
+        jugador.recibirDano();
+
+        banner.textContent =
+            `Ronda ${ronda}: ¡${enemigo.nombre} gana y te quita una vida!`;
+
+        banner.classList.add('banner-perdiste');
+
+        tarjetaJugador.classList.remove('animar-dano');
+        void tarjetaJugador.offsetWidth;
+        tarjetaJugador.classList.add('animar-dano');
+    }
+
+    // Actualizar vidas
+    $('vidas-jugador').textContent = jugador.corazones();
+    $('vidas-enemigo').textContent = enemigo.corazones();
+
+    $('contador-ronda').textContent =
+        `Ronda ${ronda} · ${jugador.nombre}: ${jugador.vidas} vidas · ${enemigo.nombre}: ${enemigo.vidas} vidas`;
+
+    // Comprobar si hay ganador
+    if (
+        jugador.estaDerrotado() ||
+        enemigo.estaDerrotado()
+    ) {
+        finalizarCombate();
     }
 }
 
-// === MOVIMIENTO ===
-// Estas funciones NO dibujan: solo cambian la velocidad. Quien mueve
-// de verdad al personaje es pintarCanvas(), que se repite sola.
-// Las usan tanto los botones del HTML como las flechas del teclado.
-// En el canvas, x crece hacia la derecha e y crece hacia ABAJO.
-function moverDerecha() {
-    jugador.velocidadX = 5;
+// ==================== FINALIZAR COMBATE ====================
+function finalizarCombate() {
+    partidaTerminada = true;
+    combateEnCurso = true;
+
+    teclas.clear();
+
+    clearInterval(intervaloCombate);
+    clearInterval(intervaloMapa);
+
+    const banner = $('banner-resultado');
+    banner.className = '';
+
+    if (jugador.estaDerrotado()) {
+        banner.textContent =
+            `💀 ¡DERROTA! ${enemigo.nombre} ganó el combate.`;
+
+        banner.classList.add('banner-perdiste');
+    } else {
+        banner.textContent =
+            `🏆 ¡VICTORIA! ${jugador.nombre} derrotó a ${enemigo.nombre}.`;
+
+        banner.classList.add('banner-ganaste');
+    }
+
+    $('estado-mapa').textContent =
+        'Combate finalizado.';
+
+    $('contador-ronda').textContent =
+        `Resultado final después de ${ronda} rondas.`;
+
+    seccionReiniciar.style.display = 'block';
+
+    seccionReiniciar.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
 }
 
-function moverIzquierda() {
-    jugador.velocidadX = -5;
+// ==================== ATAQUES MANUALES ====================
+function ataqueManual(tipo) {
+    if (!combateEnCurso || partidaTerminada) return;
+
+    clearInterval(intervaloCombate);
+
+    ronda++;
+
+    const ataques = Object.keys(EMOJIS_ATAQUE);
+
+    jugador.ataque = tipo;
+
+    enemigo.ataque = ataques[
+        numeroAleatorio(0, ataques.length - 1)
+    ];
+
+    resolverCombate();
+
+    // Continuar el combate automático si nadie ganó todavía
+    if (!partidaTerminada) {
+        intervaloCombate = setInterval(() => {
+            if (partidaTerminada) {
+                clearInterval(intervaloCombate);
+                return;
+            }
+
+            ronda++;
+
+            jugador.ataque = ataques[
+                numeroAleatorio(0, ataques.length - 1)
+            ];
+
+            enemigo.ataque = ataques[
+                numeroAleatorio(0, ataques.length - 1)
+            ];
+
+            resolverCombate();
+        }, 1200);
+    }
 }
 
-function moverAbajo() {
-    jugador.velocidadY = 5;
+// ==================== INICIAR JUEGO ====================
+function iniciarJuego() {
+    renderizarTarjetasPersonajes();
+    configurarBotonesMovimiento();
+
+    botonPersonaje.addEventListener(
+        'click',
+        seleccionarPersonaje
+    );
+
+    $('boton-punio').addEventListener(
+        'click',
+        () => ataqueManual('punio')
+    );
+
+    $('boton-patada').addEventListener(
+        'click',
+        () => ataqueManual('patada')
+    );
+
+    $('boton-barrida').addEventListener(
+        'click',
+        () => ataqueManual('barrida')
+    );
+
+    botonReiniciar.addEventListener(
+        'click',
+        () => window.location.reload()
+    );
 }
 
-function moverArriba() {
-    jugador.velocidadY = -5;
-}
-
-// Al soltar el botón (o la tecla) la velocidad vuelve a 0 y el personaje se frena.
-function detenerMovimiento() {
-    jugador.velocidadX = 0;
-    jugador.velocidadY = 0;
-}
-
-// INICIO DEL CICLO DE VIDA
-// El <script> está al final del <body>, así que el HTML ya existe:
-// se puede llamar directamente, sin esperar el evento "load".
 iniciarJuego();
