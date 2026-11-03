@@ -2665,6 +2665,50 @@ let routeMapLayers = null;
 let stopMarkers = [];
 let activeRouteAbort = null;
 
+const routeLinePalette = [
+    "#2878a5", "#d94841", "#168b72", "#7a4db6", "#e67e22",
+    "#2563eb", "#c026d3", "#0891b2", "#ca8a04", "#dc2626",
+    "#059669", "#4f46e5", "#be185d"
+];
+
+function getRouteLineColor(schedule) {
+    const routeKey = `${lineSelect?.value || ""}-${schedule.code || ""}-${schedule.title || ""}`;
+    let hash = 0;
+    for (let i = 0; i < routeKey.length; i += 1) {
+        hash = ((hash << 5) - hash + routeKey.charCodeAt(i)) | 0;
+    }
+    return routeLinePalette[Math.abs(hash) % routeLinePalette.length];
+}
+
+function getButtiniRouteGeometry(schedule) {
+    const geometries = window.buttiniRouteGeometries;
+    if (!geometries) return null;
+
+    const title = `${schedule.title || ""} ${schedule.stops?.join(" ") || ""}`.toLowerCase();
+    let routeName = "";
+
+    if (schedule.code.startsWith("LABERINTO") || title.includes("laberinto")) {
+        routeName = "BUTTINI 548 - Laberinto de Borges";
+    } else if (String(schedule.code).startsWith("547")) {
+        routeName = "BUTTINI 547 - El Nihuil";
+    } else if (String(schedule.code).startsWith("571")) {
+        routeName = "BUTTINI 571 - El Cristo x Jensen";
+    } else if (String(schedule.code).startsWith("574")) {
+        routeName = title.includes("aeropuerto")
+            ? "BUTTINI 575/574 - Aeropuerto a Terminal"
+            : "BUTTINI 574 - El Cristo (para ir al Aeropuerto)";
+    } else if (String(schedule.code).startsWith("575")) {
+        if (title.includes("reyunos")) {
+            routeName = "BUTTINI 575 - Los Reyunos";
+        } else {
+            routeName = "BUTTINI 575 - Villa 25 de Mayo";
+        }
+    }
+
+    const routeSegments = geometries[routeName];
+    return Array.isArray(routeSegments) ? routeSegments : null;
+}
+
 function initRouteMap() {
     if (routeMap) return;
     const mapElement = document.querySelector("#route-map");
@@ -2712,6 +2756,9 @@ async function renderRouteMap(schedule) {
         const [lat, lon] = getStopCoordinate(stop, i, schedule.stops.length);
         return { name: stop, lat, lon, index: i, time: currentTrip[i] || "" };
     });
+    const routeLineColor = getRouteLineColor(schedule);
+    const routeLegendLine = document.querySelector("#route-legend-line");
+    if (routeLegendLine) routeLegendLine.style.backgroundColor = routeLineColor;
 
     // Marcadores por cada parada
     waypoints.forEach((pt, i) => {
@@ -2758,20 +2805,45 @@ async function renderRouteMap(schedule) {
     if (mapTitle) mapTitle.textContent = `${schedule.code} · ${schedule.title || "Recorrido urbano"}`;
     if (mapKicker) {
         mapKicker.textContent = isButini
-            ? `PARADAS EN UBICACIÓN REFERENCIAL · ${selectedLineLabel()}`
+            ? `TRAZADO GEOGRÁFICO KML · ${selectedLineLabel()}`
             : `TRAZADO REAL · ${selectedLineLabel()}`;
     }
     const mapTip = document.querySelector(".map-tip");
     if (mapTip) {
         mapTip.textContent = isButini
-            ? "Ubicaciones esquemáticas: los PDF no incluyen coordenadas geográficas."
+            ? "Recorrido trazado con la geometría del KML oficial."
             : "💡 Haz clic en una parada del mapa o de la lista para localizarla.";
     }
 
     if (isButini) {
+        const routeSegments = getButtiniRouteGeometry(schedule);
+        if (routeSegments) {
+            routeSegments.forEach((segment) => {
+                if (segment.length > 1) {
+                    L.polyline(segment, {
+                        color: routeLineColor,
+                        weight: 5,
+                        opacity: 0.9,
+                        lineCap: "round",
+                        lineJoin: "round"
+                    }).addTo(routeMapLayers);
+                }
+            });
+        } else {
+            const directCoordinates = waypoints.map(pt => [pt.lat, pt.lon]);
+            L.polyline(directCoordinates, {
+                color: routeLineColor,
+                weight: 5,
+                opacity: 0.9,
+                lineCap: "round",
+                lineJoin: "round"
+            }).addTo(routeMapLayers);
+        }
         routeMap.fitBounds(routeMapLayers.getBounds().pad(0.12));
         if (statusBadge) {
-            statusBadge.textContent = "Ubicaciones referenciales · no usar para navegación";
+            statusBadge.textContent = getButtiniRouteGeometry(schedule)
+                ? "Trazado Buttini cargado desde el KML"
+                : "Ubicaciones referenciales · trazado aproximado";
         }
         setTimeout(() => routeMap.invalidateSize(), 200);
         return;
@@ -2780,7 +2852,7 @@ async function renderRouteMap(schedule) {
     // Trazado fallback directo inicial
     const directCoordinates = waypoints.map(pt => [pt.lat, pt.lon]);
     let polyline = L.polyline(directCoordinates, {
-        color: "#2878a5",
+        color: routeLineColor,
         weight: 5,
         opacity: 0.85,
         lineCap: "round",
@@ -2813,7 +2885,7 @@ async function renderRouteMap(schedule) {
                 routeMapLayers.removeLayer(polyline);
                 const latLngs = roadCoords.map(([lon, lat]) => [lat, lon]);
                 polyline = L.polyline(latLngs, {
-                    color: "#168b72",
+                    color: routeLineColor,
                     weight: 6,
                     opacity: 0.9,
                     lineCap: "round",
