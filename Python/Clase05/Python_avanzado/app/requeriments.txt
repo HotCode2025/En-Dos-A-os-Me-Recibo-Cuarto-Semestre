@@ -1,0 +1,23 @@
+contourpy==1.4.0
+cycler==0.12.1
+fonttools==4.67.0
+kiwisolver==1.5.1
+matplotlib==3.11.2
+numpy==2.5.4
+packaging==26.3
+pillow==13.0.0
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+six==1.17.0
+
+# Archivo requeriments.txt
+```
+    sh 
+    git clone https://...
+    cd app
+    python3 -m venv env #Se debe crear el entorno virtual, este no se comparte desde GitHub
+    source env/bin/activate #Activamos el entorno virtual en Linux
+    venv/Script/activate #Activamos el entorno virtual en Windows
+    pip3 install -r requeriments.txt #Instala las dependencias (-r -> significa reutilizar) 
+    python3 main.py #Ejecutamos el programa
+```
