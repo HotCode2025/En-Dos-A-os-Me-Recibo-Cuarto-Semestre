@@ -1,11 +1,13 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 const props = defineProps({
   products: { type: Array, required: true },
   searchQuery: { type: String, default: '' },
   showCategories: { type: Boolean, default: true },
   limit: { type: Number, default: 0 },
+  // Muestra los productos en una fila desplazable en lugar de la grilla.
+  carousel: { type: Boolean, default: false },
   title: { type: String, default: 'Productos destacados' },
   eyebrow: { type: String, default: 'LO MÁS BUSCADO' },
   subtitle: { type: String, default: '' },
@@ -129,6 +131,37 @@ const visibleProducts = computed(() => {
   return props.limit ? filtered.slice(0, props.limit) : filtered
 })
 
+// Carrusel: avanza de a una "página" visible y deshabilita las flechas en los extremos.
+const carouselTrack = ref(null)
+const canScrollPrev = ref(false)
+const canScrollNext = ref(false)
+
+function updateCarouselControls() {
+  const track = carouselTrack.value
+  if (!track) return
+  canScrollPrev.value = track.scrollLeft > 1
+  canScrollNext.value = track.scrollLeft + track.clientWidth < track.scrollWidth - 1
+}
+
+function scrollCarousel(direction) {
+  const track = carouselTrack.value
+  if (!track) return
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  track.scrollBy({ left: direction * track.clientWidth, behavior: reduceMotion ? 'auto' : 'smooth' })
+}
+
+watch(visibleProducts, () => nextTick(updateCarouselControls))
+watch(
+  () => props.loading,
+  () => nextTick(updateCarouselControls),
+)
+
+onMounted(() => {
+  window.addEventListener('resize', updateCarouselControls)
+  nextTick(updateCarouselControls)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', updateCarouselControls))
+
 const formatPrice = (price) =>
   new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -246,7 +279,29 @@ const formatPrice = (price) =>
       </button>
     </div>
 
-    <div v-if="visibleProducts.length" class="product-grid">
+    <div
+      v-if="visibleProducts.length"
+      :class="carousel ? 'product-carousel' : null"
+      :role="carousel ? 'region' : null"
+      :aria-roledescription="carousel ? 'carrusel' : null"
+      :aria-label="carousel ? title : null"
+    >
+    <button
+      v-if="carousel"
+      class="carousel-button carousel-button-prev"
+      type="button"
+      aria-label="Ver productos anteriores"
+      :disabled="!canScrollPrev"
+      @click="scrollCarousel(-1)"
+    >
+      ‹
+    </button>
+    <div
+      ref="carouselTrack"
+      :class="carousel ? 'product-carousel-track' : 'product-grid'"
+      :tabindex="carousel ? 0 : null"
+      @scroll="carousel && updateCarouselControls()"
+    >
       <article v-for="product in visibleProducts" :key="product.id" class="product-card">
         <div class="product-image-wrap">
           <img v-if="product.image" :src="product.image" :alt="product.imageAlt" loading="lazy" />
@@ -287,6 +342,17 @@ const formatPrice = (price) =>
           </div>
         </div>
       </article>
+    </div>
+    <button
+      v-if="carousel"
+      class="carousel-button carousel-button-next"
+      type="button"
+      aria-label="Ver más productos"
+      :disabled="!canScrollNext"
+      @click="scrollCarousel(1)"
+    >
+      ›
+    </button>
     </div>
 
     <div v-else class="empty-results">

@@ -1,50 +1,55 @@
 const ordenService = require("../services/ordenService");
+const { responderError } = require("../utils/responderError");
+const { parseId } = require("../utils/parseId");
 
 const ordenController = {
-  crearOrden: async (req, res) => {
+  crearOrden: async (req, res, next) => {
     try {
       const usuarioId = req.usuario.id; // Extraído del token JWT
-      const { metodoPagoId } = req.body;
+      const { metodoPagoId } = req.body ?? {};
 
       if ( !metodoPagoId) {
         return res.status(400).json({
           error: "Faltan datos obligatorio: metodoPagoId",
         });
       }
+      if (!Number.isInteger(Number(metodoPagoId)) || Number(metodoPagoId) <= 0) {
+        return res.status(400).json({ error: "El metodoPagoId debe ser un entero positivo" });
+      }
 
       const resultado = await ordenService.crearOrdenDesdeCarrito(
         usuarioId,
-        metodoPagoId,
+        Number(metodoPagoId),
       );
       return res.status(201).json(resultado);
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return responderError(error, res, next);
     }
   },
 
-  getMisOrdenes: async (req, res) => {
+  getMisOrdenes: async (req, res, next) => {
     try {
       const usuarioId = req.usuario.id;
       const ordenes = await ordenService.getMisOrdenes(usuarioId);
       return res.status(200).json(ordenes);
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return responderError(error, res, next);
     }
   },
 
-  getAllOrdenes: async (req, res) => {
+  getAllOrdenes: async (req, res, next) => {
     try {
       const ordenes = await ordenService.getAllOrdenes();
       return res.status(200).json(ordenes);
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return responderError(error, res, next);
     }
   },
 
-  actualizarEstado: async (req, res) => {
+  actualizarEstado: async (req, res, next) => {
     try {
-      const ordenId = req.params.id;
-      const { nuevoEstado } = req.body;
+      const ordenId = parseId(req.params.id);
+      const { nuevoEstado } = req.body ?? {};
 
       if (!nuevoEstado) {
         return res
@@ -52,17 +57,18 @@ const ordenController = {
           .json({ error: "El campo nuevoEstado es obligatorio" });
       }
 
-      const ordenActualizada = await ordenService.actualizarEstado(
+      const { orden, reembolsos } = await ordenService.actualizarEstado(
         ordenId,
         nuevoEstado,
       );
 
       return res.status(200).json({
         mensaje: "Estado de la orden actualizado exitosamente",
-        orden: ordenActualizada,
+        orden,
+        reembolsos,
       });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return responderError(error, res, next);
     }
   },
 };

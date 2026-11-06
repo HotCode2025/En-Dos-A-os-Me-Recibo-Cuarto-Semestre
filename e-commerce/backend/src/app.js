@@ -1,16 +1,25 @@
 // src/app.js
 const express = require("express");
+const cors = require("cors"); // 1. Importamos CORS
+const { obtenerOrigenesPermitidos } = require("./config/cors");
 const app = express();
 
 // Middlewares globales
+// 2. Configuramos CORS: localhost por defecto, o CORS_ORIGIN / FRONTEND_URL en producción
+app.use(
+  cors({
+    origin: obtenerOrigenesPermitidos(),
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
 // permitimos que la app reciba en las peticiones json
 app.use(express.json());
 
 // Importación de rutas principales
 const apiRouter = require("./routes/api");
-const carritoRoute = require("./routes/carritoRoute");
-const ordenRoutes = require("./routes/ordenRoute");
-const metodoPagoRoutes = require("./routes/metodoPagoRoute");
+const { errorHandler, noEncontrado } = require("./middlewares/errorHandler");
 
 // Ruta principal de prueba
 app.get("/", (req, res) => {
@@ -29,11 +38,12 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-// Montar el enrutador principal en /api/v1 (o la ruta que prefieras)
+// Montar el enrutador principal en /api/v1
 app.use("/api/v1", apiRouter);
-app.use("/api/v1/carrito", carritoRoute);
-app.use("/api/v1/ordenes", ordenRoutes);
-app.use("/api/v1/metodos-pago", metodoPagoRoutes);
 
-// Exportamos la app configurada (sin levantar el servidor aún)
+// Al final: 404 en JSON y manejo central de errores (contrato { error })
+app.use(noEncontrado);
+app.use(errorHandler);
+
+// Exportamos la app configurada
 module.exports = app;

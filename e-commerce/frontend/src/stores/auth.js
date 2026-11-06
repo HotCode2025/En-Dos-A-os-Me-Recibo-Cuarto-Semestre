@@ -32,4 +32,11 @@ function logout() {
   session.value = null
 }
 
-export { accessToken, currentUser, isAdmin, login, logout }
+// Actualiza los datos del usuario de la sesión (por ejemplo, tras editar el perfil) sin tocar el token ni el rol.
+function actualizarUsuarioSesion(cambios) {
+  if (!session.value) return
+  const { rol, id, ...permitidos } = cambios ?? {}
+  login({ ...session.value, usuario: { ...session.value.usuario, ...permitidos } })
+}
+
+export { accessToken, actualizarUsuarioSesion, currentUser, isAdmin, login, logout }

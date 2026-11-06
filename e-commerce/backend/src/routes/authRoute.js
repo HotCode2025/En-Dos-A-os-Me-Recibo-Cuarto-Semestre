@@ -5,7 +5,7 @@ const authController = require('../controllers/authController')
 
 
 //ruta para añadir un usuario
-router.post('/register', validarUsuario.nuevoUsuario ,authController.resgistrarUsuario);
+router.post('/register', validarUsuario.nuevoUsuario ,authController.registrarUsuario);
 
 //ruta para login de un usuario.
 router.post('/login', validarUsuario.login , authController.loginUsuario);

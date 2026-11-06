@@ -12,13 +12,13 @@ const pool = new Pool({
   ssl: isLocal ? false : { rejectUnauthorized: false },
 });
 
-pool.on("connect", () => {
-  // console.log('Conexión a la base de datos establecida.');
-});
-
-pool.on("error", (err) => {
+// Neon corta las conexiones inactivas: el error se registra, pero el servidor sigue en pie
+// (el pool descarta el cliente roto y abre otro en la próxima consulta).
+function manejarErrorDelPool(err) {
   console.error("Error inesperado en el pool de la base de datos", err);
-  process.exit(-1);
-});
+}
+
+pool.on("error", manejarErrorDelPool);
+pool.manejarErrorDelPool = manejarErrorDelPool;
 
 module.exports = pool;

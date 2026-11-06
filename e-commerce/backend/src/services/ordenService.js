@@ -1,30 +1,33 @@
 const ordenModel = require("../models/ordenModel");
-const carritoModel = require("../models/carritoModel");
+const metodoPagoModel = require("../models/metodoPagoModel");
+const pagoService = require("./pagoService");
+const HttpError = require("../utils/httpError");
+
+// Estados a los que puede pasar cada estado. Entregado y Cancelado son finales.
+const TRANSICIONES = {
+  Pendiente: ["Pagado", "Cancelado"],
+  Pagado: ["Enviado", "Cancelado"],
+  Enviado: ["Entregado"],
+  Entregado: [],
+  Cancelado: [],
+};
+
+const esTransicionValida = (estadoActual, nuevoEstado) =>
+  (TRANSICIONES[estadoActual] || []).includes(nuevoEstado);
 
 const ordenService = {
   crearOrdenDesdeCarrito: async (usuarioId, metodoPagoId) => {
-    const carritoId = await carritoModel.obtenerCarritoPorUsuario(usuarioId);
-    const items = await carritoModel.obtenerItemsCarrito(carritoId);
-
-    if (!items || items.length === 0) {
-      throw new Error("El carrito está vacío. No se puede generar una orden.");
+    const metodoPago = await metodoPagoModel.getById(metodoPagoId);
+    if (!metodoPago || !metodoPago.activo) {
+      throw new HttpError(400, "El método de pago no existe o no está disponible");
     }
 
-    const total = items.reduce(
-      (acc, item) => acc + parseFloat(item.subtotal),
-      0,
-    );
-
-    const nuevaOrden = await ordenModel.crearOrdenTransaccional(
-      usuarioId,
-      metodoPagoId,
-      items,
-      total,
-    );
+    // El stock, el total y el vaciado del carrito se resuelven dentro de una única transacción
+    const { orden, items } = await ordenModel.crearOrdenTransaccional(usuarioId, metodoPagoId);
 
     return {
       mensaje: "Orden creada exitosamente",
-      orden: nuevaOrden,
+      orden,
       items,
     };
   },
@@ -38,14 +41,7 @@ const ordenService = {
   },
 
   actualizarEstado: async (ordenId, nuevoEstado) => {
-    // Validamos que el estado sea uno de los permitidos por tu lógica de negocio
-    const estadosPermitidos = [
-      "Pendiente",
-      "Pagado",
-      "Enviado",
-      "Entregado",
-      "Cancelado",
-    ];
+    const estadosPermitidos = Object.keys(TRANSICIONES);
 
     if (!estadosPermitidos.includes(nuevoEstado)) {
       throw new Error(
@@ -53,16 +49,27 @@ const ordenService = {
       );
     }
 
-    const ordenActualizada = await ordenModel.actualizarEstadoOrden(
+    const { orden, estadoAnterior } = await ordenModel.actualizarEstadoOrden(
       ordenId,
       nuevoEstado,
+      esTransicionValida,
     );
 
-    if (!ordenActualizada) {
-      throw new Error("La orden especificada no existe");
+    // La cancelación ya quedó guardada; si falla el reembolso se avisa para hacerlo a mano
+    if (nuevoEstado === "Cancelado" && estadoAnterior === "Pagado") {
+      try {
+        const reembolsos = await pagoService.reembolsarPagosAprobadosDeOrden(orden.id);
+        return { orden, reembolsos };
+      } catch (error) {
+        console.error(`No se pudo reembolsar la orden #${orden.id}:`, error);
+        throw new HttpError(
+          502,
+          `La orden #${orden.id} se canceló, pero no se pudo reembolsar el pago en Mercado Pago. Debe reembolsarse manualmente desde el panel de Mercado Pago.`,
+        );
+      }
     }
 
-    return ordenActualizada;
+    return { orden, reembolsos: [] };
   },
 };
 

@@ -13,12 +13,9 @@ const requiredColumns = {
   ],
   carrito: ["id", "id_usuario", "fecha_creacion"],
   item_carrito: ["id", "id_carrito", "cantidad", "id_producto"],
-  direccion: [
-    "id", "id_usuario", "calle_numero", "ciudad", "codigo_postal", "pais", "es_principal",
-  ],
   metodo_pago: ["id", "nombre", "descripcion", "instrucciones", "activo"],
   orden: [
-    "id", "id_usuario", "id_direccion_envio", "id_metodo_pago",
+    "id", "id_usuario", "id_metodo_pago",
     "fecha_pedido", "estado", "total",
   ],
   detalle_orden: ["id", "id_orden", "cantidad", "precio_unitario", "id_producto"],
@@ -50,9 +47,9 @@ async function verificarEsquema() {
   }
 
   if (missing.length) {
-    throw new Error(`El esquema de la base de datos no coincide con el ERD:\n- ${missing.join("\n- ")}`);
+    throw new Error(`El esquema de la base de datos no tiene las tablas y columnas que usa la aplicación:\n- ${missing.join("\n- ")}`);
   }
-  console.log("El esquema de PostgreSQL coincide con el ERD esperado.");
+  console.log("El esquema de PostgreSQL tiene las tablas y columnas que usa la aplicación.");
 }
 
 if (require.main === module) {

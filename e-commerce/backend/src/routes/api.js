@@ -1,25 +1,30 @@
-// src/routes/index.js
-const express = require('express');
+// src/routes/index.js (o api.js)
+const express = require("express");
 const router = express.Router();
 
-// Importación de los archivos de rutas individuales
-const usuarioRoute = require('./UsuarioRoute');
-const authRoute = require('./authRoute');
-const productoRoute = require('./productoRoute');
-const inventarioRoute = require('./inventarioRoute');
+// Importaciones actuales
+const usuarioRoute = require("./UsuarioRoute");
+const authRoute = require("./authRoute");
+const productoRoute = require("./productoRoute");
+const inventarioRoute = require("./inventarioRoute");
+const pagoRoute = require("./pagoRoute");
+const carritoRoute = require("./carritoRoute");
+const ordenRoute = require("./ordenRoute");
+const metodoPagoRoute = require("./metodoPagoRoute");
 
-//importamos el middlewares para proteger la ruta, es decir, solo se puede acceder a la misma si la petición tiene un token válido
-const autenticacionMiddleware = require('../middlewares/autenticacionMiddleware');
+const autenticacionMiddleware = require("../middlewares/autenticacionMiddleware");
 
+// RUTAS PÚBLICAS
+router.use("/auth", authRoute);
+router.use("/productos", productoRoute);
+router.use("/inventario", inventarioRoute);
 
-//RUTAS PÚBLICAS
-router.use('/auth', authRoute);
-router.use('/productos', productoRoute);
-router.use('/inventario', inventarioRoute);
-
-//RUTAS PRIVADAS: sólo se puede acceder si el usuario esta logueado. 
-
-// se define los prefijos para cada grupo de rutas
-router.use('/usuarios', autenticacionMiddleware.verificarToken, usuarioRoute);
+// RUTAS PRIVADAS
+router.use("/usuarios", autenticacionMiddleware.verificarToken, usuarioRoute);
+router.use("/carrito", carritoRoute);
+router.use("/ordenes", ordenRoute);
+router.use("/metodos-pago", metodoPagoRoute);
+// Pagos: cada ruta declara su propia protección (el webhook es público y valida la firma)
+router.use("/pagos", pagoRoute);
 
 module.exports = router;

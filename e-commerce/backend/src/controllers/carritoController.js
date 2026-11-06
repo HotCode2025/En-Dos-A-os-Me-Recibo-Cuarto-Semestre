@@ -1,22 +1,23 @@
 const carritoService = require("../services/carritoService");
+const { responderError } = require("../utils/responderError");
 
 const carritoController = {
   // Obtiene el carrito del usuario autenticado
-  getMiCarrito: async (req, res) => {
+  getMiCarrito: async (req, res, next) => {
     try {
       const usuarioId = req.usuario.id;
       const carrito = await carritoService.getCarritoByUsuario(usuarioId);
       res.status(200).json(carrito);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      responderError(error, res, next);
     }
   },
 
   // Agrega un producto al carrito
-  agregarProducto: async (req, res) => {
+  agregarProducto: async (req, res, next) => {
     try {
       const usuarioId = req.usuario.id;
-      const { productoId, cantidad } = req.body;
+      const { productoId, cantidad } = req.body ?? {};
 
       if (
         !Number.isInteger(productoId) ||
@@ -42,14 +43,14 @@ const carritoController = {
         datos: itemAgregado,
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      responderError(error, res, next);
     }
   },
   // Resta la cantidad de un producto en el carrito
-  restarProducto: async (req, res) => {
+  restarProducto: async (req, res, next) => {
     try {
       const usuarioId = req.usuario.id;
-      const { productoId, cantidad } = req.body;
+      const { productoId, cantidad } = req.body ?? {};
 
       if (
         !Number.isInteger(productoId) ||
@@ -75,20 +76,25 @@ const carritoController = {
         datos: itemRestado,
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      responderError(error, res, next);
     }
   },
 
   // Elimina un producto por completo del carrito
-  quitarProducto: async (req, res) => {
+  quitarProducto: async (req, res, next) => {
     try {
       const usuarioId = req.usuario.id;
-      const { productoId } = req.params;
+      const productoId = Number(req.params.productoId);
 
-      if (!productoId) {
+      if (!req.params.productoId) {
         return res
           .status(400)
           .json({ error: "El ID del producto es obligatorio" });
+      }
+      if (!Number.isInteger(productoId) || productoId <= 0) {
+        return res
+          .status(400)
+          .json({ error: "El ID del producto debe ser un entero positivo" });
       }
 
       await carritoService.quitarItem(usuarioId, productoId);
@@ -97,7 +103,7 @@ const carritoController = {
         mensaje: "Producto eliminado del carrito exitosamente",
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      responderError(error, res, next);
     }
   },
 };

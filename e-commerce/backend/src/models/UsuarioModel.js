@@ -35,18 +35,27 @@ const Usuario = {
   // Método que esta usandose en: auth (para el lógin), para mostrar el perfil del usuario. 
   async getUsuarioBy(campo, valor) {
     // 1. Validamos las columnas permitidas
-    const columnasPermitidas = ['id', 'email', 'username', 'telefono'];
+    const columnasPermitidas = ['id', 'email', 'telefono'];
 
     if (!columnasPermitidas.includes(campo)) {
       throw new Error(`Búsqueda por campo no permitido: ${campo}`);
     }
 
-    // 1. Construir la consulta.
-    const query = `SELECT *, password_hash FROM usuario WHERE ${campo} = $1`;
+    // 1. Construir la consulta. El email se compara sin distinguir mayúsculas porque pueden existir emails viejos con ellas.
+    const condicion = campo === 'email' ? 'LOWER(email) = LOWER($1)' : `${campo} = $1`;
+    const query = `SELECT * FROM usuario WHERE ${condicion}`;
     const result = await pool.query(query, [valor]);
 
     // 2. Retornarmos el primer resultado (o null si no existe)
     return result.rows[0] || null;
+  },
+
+  // Indica si ya hay un usuario con ese email (sin distinguir mayúsculas). excluirId deja afuera al propio usuario.
+  async existeEmail(email, excluirId) {
+    const result = excluirId === undefined
+      ? await pool.query('SELECT 1 FROM usuario WHERE LOWER(email) = LOWER($1) LIMIT 1', [email])
+      : await pool.query('SELECT 1 FROM usuario WHERE LOWER(email) = LOWER($1) AND id <> $2 LIMIT 1', [email, excluirId]);
+    return result.rows.length > 0;
   },
 
   //método que le permite a un usuario modificar su perfil

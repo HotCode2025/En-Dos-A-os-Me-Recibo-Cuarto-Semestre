@@ -9,6 +9,13 @@ router.get(
   "/",
   metodoPagoController.getMetodosPago,
 );
+// Lista activos e inactivos (panel de administración). Va ANTES de "/:id" para que "admin" no se tome como un id.
+router.get(
+  "/admin",
+  verificarToken,
+  permitRoles("ADMIN"),
+  metodoPagoController.getTodosMetodosPago,
+);
 router.get(
   "/:id",
   verificarToken,

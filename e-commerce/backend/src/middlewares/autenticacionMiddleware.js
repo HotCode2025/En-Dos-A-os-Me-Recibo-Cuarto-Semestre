@@ -11,8 +11,7 @@ const autenticacionMiddleware = {
     // 2. Si no hay token en la petición, rechazamos la petición (401 No Autorizado)
     if (!token) {
       return res.status(401).json({
-        ok: false,
-        mensaje: "Acceso no autorizado",
+        error: "Acceso no autorizado",
       });
     }
 
@@ -29,10 +28,10 @@ const autenticacionMiddleware = {
       // 5. Todo está bien, damos paso a la siguiente función
       next();
     } catch (error) {
-      // Si el token expiró o fue alterado (403 Prohibido)
-      return res.status(403).json({
-        ok: false,
-        mensaje: "Token inválido o expirado.",
+      // Si el token expiró o fue alterado también es 401: el cliente debe volver a iniciar sesión.
+      // El 403 queda reservado para "autenticado pero sin permiso" (roleMiddleware).
+      return res.status(401).json({
+        error: "Token inválido o expirado.",
       });
     }
   },

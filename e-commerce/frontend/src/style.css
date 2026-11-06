@@ -595,6 +595,100 @@ input:focus-visible {
   gap: 27px 17px;
 }
 
+/* Carrusel de productos (inicio): misma tarjeta que la grilla, en una fila desplazable. */
+.product-carousel {
+  position: relative;
+}
+
+.product-carousel-track {
+  --carousel-gap: 17px;
+  --carousel-visible: 4;
+  display: grid;
+  grid-auto-columns: calc(
+    (100% - (var(--carousel-visible) - 1) * var(--carousel-gap)) / var(--carousel-visible)
+  );
+  grid-auto-flow: column;
+  gap: var(--carousel-gap);
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.product-carousel-track > .product-card {
+  scroll-snap-align: start;
+}
+
+.product-carousel-track:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 40%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 6px 18px rgb(8 39 68 / 12%);
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.carousel-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.carousel-button:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.carousel-button-prev {
+  left: -14px;
+}
+
+.carousel-button-next {
+  right: -14px;
+}
+
+@media (max-width: 960px) {
+  .product-carousel-track {
+    --carousel-visible: 3;
+  }
+}
+
+@media (max-width: 700px) {
+  .product-carousel-track {
+    --carousel-gap: 10px;
+    --carousel-visible: 2;
+  }
+
+  .carousel-button-prev {
+    left: -6px;
+  }
+
+  .carousel-button-next {
+    right: -6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-carousel-track {
+    scroll-behavior: auto;
+  }
+}
+
 .product-card {
   min-width: 0;
   overflow: hidden;
@@ -1008,6 +1102,14 @@ input:focus-visible {
   object-fit: cover;
 }
 
+.cart-item-no-image {
+  flex: 0 0 78px;
+  width: 78px;
+  height: 85px;
+  border-radius: 5px;
+  background: #f1f5f9;
+}
+
 .cart-item-info {
   display: flex;
   flex: 1;
@@ -1225,6 +1327,8 @@ input:focus-visible {
     border-bottom: 1px solid var(--line);
     background: white;
     box-shadow: 0 12px 20px rgb(19 43 67 / 8%);
+    max-height: calc(100dvh - 120px);
+    overflow-y: auto;
   }
 
   .desktop-nav.mobile-nav-open a {
@@ -1944,19 +2048,11 @@ input:focus-visible {
 }
 
 .login-forgot {
-  display: block;
-  width: fit-content;
+  max-width: 280px;
   margin: 19px auto 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--accent-dark);
+  color: #526a83;
   font-size: 10px;
-  cursor: pointer;
-}
-
-.login-forgot:hover {
-  text-decoration: underline;
+  text-align: center;
 }
 
 .login-back-link {
@@ -2160,5 +2256,329 @@ input:focus-visible {
 
   .product-editor {
     padding: 17px;
+  }
+}
+
+/* ---------- Cuenta del usuario y panel de administración ---------- */
+
+.login-switch {
+  margin: 19px 0 0;
+  color: #526a83;
+  font-size: 10px;
+  text-align: center;
+}
+
+.login-switch a {
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.login-switch a:hover {
+  text-decoration: underline;
+}
+
+.form-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 11px 12px;
+  border: 1px solid #dce4ee;
+  border-radius: 5px;
+  background: white;
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.form-field select:focus {
+  border-color: #80b6ed;
+  outline: 2px solid rgb(8 118 232 / 12%);
+}
+
+.account-panel {
+  padding-top: 34px;
+  padding-bottom: 64px;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.account-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.account-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fbfdff;
+}
+
+.account-card h2,
+.account-card h3 {
+  margin: 0;
+  font-family: Manrope, sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.account-card > .primary-button {
+  width: fit-content;
+}
+
+.account-card .primary-button:disabled,
+.table-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-success-box,
+.form-warning-box {
+  margin: 0;
+  padding: 11px 14px;
+  border-radius: 6px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.form-success-box {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.form-warning-box {
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: white;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table th {
+  background: var(--paper);
+  color: #506176;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table .row-muted {
+  color: var(--muted);
+  background: #fafbfc;
+}
+
+.data-table .row-alert td {
+  background: #fff5f4;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #eef2f6;
+  color: #506176;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-pagado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-enviado {
+  background: var(--pale-blue);
+  color: var(--accent-dark);
+}
+
+.status-entregado {
+  background: #e0f2f1;
+  color: #0f766e;
+}
+
+.status-cancelado,
+.status-inactivo,
+.status-sin-stock {
+  background: #fee4e2;
+  color: #b42318;
+}
+
+.status-activo {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.table-action {
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: white;
+  color: var(--accent-dark);
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.table-action:hover:not(:disabled) {
+  border-color: #80b6ed;
+}
+
+.table-action-danger {
+  color: #b42318;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.inline-input {
+  width: 84px;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid #dce4ee;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.inline-input.is-zero {
+  border-color: #f0a29b;
+  background: #fff5f4;
+  color: #b42318;
+  font-weight: 700;
+}
+
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-tabs a {
+  padding: 10px 15px;
+  border-bottom: 2px solid transparent;
+  color: #506176;
+  font-size: 11px;
+}
+
+.admin-tabs a:hover {
+  color: var(--accent);
+}
+
+.admin-tabs a.router-link-active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-toolbar p {
+  margin: 0;
+  color: #607188;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.cart-item-remove {
+  margin-top: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #b42318;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.cart-item-remove:hover {
+  text-decoration: underline;
+}
+
+.notice-link {
+  margin-left: 10px;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-grid .span-2 {
+    grid-column: auto;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.desktop-nav a,
+.nav-logout {
+  white-space: nowrap;
+}
+
+/* Con más enlaces en el header (cuenta y administración), en anchos medios se oculta el chip de rol. */
+@media (min-width: 701px) and (max-width: 960px) {
+  .nav-role {
+    display: none;
   }
 }

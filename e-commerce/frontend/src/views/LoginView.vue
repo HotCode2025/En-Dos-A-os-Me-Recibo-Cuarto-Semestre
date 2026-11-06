@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { login } from '../stores/auth'
+import { loginRequest } from '../services/auth'
+import { sincronizarTrasLogin } from '../services/ordenes'
+import { safeRedirect } from '../utils/safeRedirect'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,32 +18,11 @@ async function submitLogin() {
   isSubmitting.value = true
 
   try {
-    const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/+$/, '')
-    const response = await fetch(`${apiBaseUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value }),
-    })
-    let result
-    try {
-      result = await response.json()
-    } catch {
-      throw new Error('El servidor devolvió una respuesta inválida.')
-    }
+    const session = await loginRequest(email.value, password.value)
 
-    if (!response.ok) {
-      throw new Error(result.error || 'No pudimos iniciar sesión. Revisá tus datos e intentá de nuevo.')
-    }
-    if (!result.token || !result.usuario?.rol) {
-      throw new Error('El servidor respondió sin los datos de sesión esperados.')
-    }
-    if (!['ADMIN', 'CLIENTE'].includes(result.usuario.rol)) {
-      throw new Error('El servidor devolvió un rol de usuario no reconocido.')
-    }
-
-    login({ token: result.token, usuario: result.usuario })
-    const destination = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    await router.push(destination)
+    login(session)
+    sincronizarTrasLogin()
+    await router.push(safeRedirect(route.query.redirect))
   } catch (error) {
     errorMessage.value =
       error instanceof TypeError
@@ -92,7 +74,13 @@ async function submitLogin() {
         </button>
       </form>
 
-      <button class="login-forgot" type="button">¿Olvidaste tu contraseña?</button>
+      <p class="login-switch">
+        ¿No tenés cuenta?
+        <RouterLink :to="{ path: '/registro', query: route.query.redirect ? { redirect: route.query.redirect } : {} }">
+          Registrate
+        </RouterLink>
+      </p>
+      <p class="login-forgot">¿Olvidaste tu contraseña? Contactá al administrador de la tienda.</p>
       <RouterLink class="login-back-link" to="/">← Volver a la tienda</RouterLink>
     </div>
   </section>

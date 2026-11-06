@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const usuarioController = require('../controllers/UsuarioController');
+const validarUsuario = require('../middlewares/validarUsuario');
 
 //Se protegen las rutas por roles
 const roleMiddleware = require('../middlewares/roleMiddleware')
@@ -11,7 +12,7 @@ const roleMiddleware = require('../middlewares/roleMiddleware')
 // RUTAS DEL PERFIL (Cualquier usuario autenticado)
 // ==========================================
 router.get('/perfil', usuarioController.getPerfil);
-router.put('/perfil', usuarioController.modificarPerfil);
+router.put('/perfil', validarUsuario.editarPerfil, usuarioController.modificarPerfil);
 
 // ==========================================
 // RUTAS DE LAS DIRECIONES DEL USUARIO (Cualquier usuario autenticado)

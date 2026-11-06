@@ -1,4 +1,7 @@
 const { body, validationResult } = require('express-validator');
+const { normalizarTelefono, telefonoValido } = require('../utils/normalizarContacto');
+
+const MENSAJE_TELEFONO = 'El teléfono debe tener entre 6 y 20 caracteres: dígitos, espacios o guiones, con un + opcional al inicio';
 
 
 //función middlewares para validar los campos del usuario
@@ -33,6 +36,7 @@ const validarUsuario = {
 
         body('email')
             .trim()
+            .toLowerCase()
             .notEmpty().withMessage('El email es requerido')
             .isEmail().withMessage('Debe tener formato de correo válido'),
 
@@ -41,21 +45,41 @@ const validarUsuario = {
             .isLength({ min: 5 }).withMessage('La contraseña debe tener al menos 5 caracteres'),
 
         body('telefono')
+            .trim()
             .notEmpty().withMessage('El teléfono es requerido')
-            .isNumeric().withMessage('El teléfono debe ser numérico'),
+            .custom(telefonoValido).withMessage(MENSAJE_TELEFONO)
+            .customSanitizer(normalizarTelefono),
 
         resultValidacion
     ],
-    //reglas para POST /auth/login 
+    //reglas para POST /auth/login
     login: [body('email')
         .trim()
+        .toLowerCase()
         .notEmpty().withMessage('El email es requerido')
         .isEmail().withMessage('Debe tener formato de correo válido'),
 
     body('password')
-        .notEmpty().withMessage('La contraseña es requerida')
+        .notEmpty().withMessage('La contraseña es requerida'),
+
+    resultValidacion
     ],
-    edit: [ /* reglas para PUT /users/:id */]
+    //reglas para PUT /usuarios/perfil: todos los campos son opcionales, pero los que llegan se validan y normalizan
+    editarPerfil: [
+        body('email')
+            .optional({ values: 'falsy' })
+            .trim()
+            .toLowerCase()
+            .isEmail().withMessage('Debe tener formato de correo válido'),
+
+        body('telefono')
+            .optional({ values: 'falsy' })
+            .trim()
+            .custom(telefonoValido).withMessage(MENSAJE_TELEFONO)
+            .customSanitizer(normalizarTelefono),
+
+        resultValidacion
+    ]
 };
 
 module.exports = validarUsuario;

@@ -1,6 +1,14 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'mi_clave_secreta_super_segura';
 const JWT_EXPIRES_IN = '2h'; // Tiempo de expiración configurable
+
+// Sin clave por defecto: si falta JWT_SECRET no se firman ni se aceptan tokens.
+function obtenerSecreto() {
+    const secreto = process.env.JWT_SECRET;
+    if (!secreto) {
+        throw new Error('JWT_SECRET no está definido');
+    }
+    return secreto;
+}
 
 const jwtUtils = {
 
@@ -9,10 +17,16 @@ const jwtUtils = {
         return new Promise((res, rej) => {
             const payload = {
                 id,
-                email, 
+                email,
                 rol
             }
-            jwt.sign(payload, JWT_SECRET, {
+            let secreto;
+            try {
+                secreto = obtenerSecreto();
+            } catch (error) {
+                return rej(error.message);
+            }
+            jwt.sign(payload, secreto, {
                 expiresIn: JWT_EXPIRES_IN
             }, (error, token) => {
 
@@ -26,8 +40,8 @@ const jwtUtils = {
     },
 
     verificarTokenJWT(token) {
-        return jwt.verify(token, JWT_SECRET);
+        return jwt.verify(token, obtenerSecreto());
     }
 }
 
-module.exports = jwtUtils; 
+module.exports = jwtUtils;

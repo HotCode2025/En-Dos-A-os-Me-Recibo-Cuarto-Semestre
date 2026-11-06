@@ -80,7 +80,7 @@ const emit = defineEmits(['add-to-cart', 'clear-search'])
     :loading="loading"
     :load-error="loadError"
     :show-categories="false"
-    :limit="4"
+    carousel
     title="Productos destacados"
     eyebrow="LO MÁS BUSCADO"
     subtitle="Elegí tus próximos favoritos con la calidad y confianza de PuntoZero."
