@@ -1,4 +1,4 @@
-const ORIGENES_POR_DEFECTO = ["http://localhost:5173", "http://localhost:3000"];
+const ORIGENES_POR_DEFECTO = ["https://puntozeroecommerce.netlify.app", "http://localhost:3000"];
 
 const normalizar = (url) => url.trim().replace(/\/+$/, "");
 

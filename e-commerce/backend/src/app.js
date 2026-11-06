@@ -2,7 +2,6 @@
 const express = require('express');
 const cors = require('cors'); // 
 const express = require("express");
-const cors = require("cors"); // 1. Importamos CORS
 const { obtenerOrigenesPermitidos } = require("./config/cors");
 const app = express();
 
