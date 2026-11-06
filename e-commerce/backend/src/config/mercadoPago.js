@@ -30,7 +30,7 @@ function obtenerFrontendUrl() {
 }
 
 function obtenerBackendPublicUrl() {
-  return (process.env.BACKEND_PUBLIC_URL || "").replace(/\/+$/, "");
+  return (process.env.BACKEND_PUBLIC_URL || "https://ecommerce-backend-21u2.onrender.com/api/v1").replace(/\/+$/, "");
 }
 
 // Mercado Pago no acepta dominios locales en back_urls con auto_return.
