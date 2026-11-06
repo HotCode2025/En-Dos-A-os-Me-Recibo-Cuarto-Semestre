@@ -8,14 +8,7 @@ const app = express();
 
 
 // 2. Configurar para que solo acepte tu URL de Netlify
-const corsOptions = {
-  origin: 'https://puntozeroecommerce.netlify.app/', 
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions)); // 3. Aplicar el middleware
-
-// Middlewares globales
+app.use(cors()); 
 // 2. Configuramos CORS: localhost por defecto, o CORS_ORIGIN / FRONTEND_URL en producción
 app.use(
   cors({
