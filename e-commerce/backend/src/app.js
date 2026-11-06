@@ -1,7 +1,6 @@
 // src/app.js
 const express = require('express');
 const cors = require('cors'); // 
-const express = require("express");
 const { obtenerOrigenesPermitidos } = require("./config/cors");
 const app = express();
 
