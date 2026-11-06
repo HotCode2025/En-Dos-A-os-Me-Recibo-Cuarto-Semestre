@@ -21,6 +21,10 @@ function normalizeProduct(row) {
 }
 
 async function getProducts() {
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/+$/, '')
+
+
+
   const rows = await apiRequest('/productos')
   if (!Array.isArray(rows)) {
     throw new Error('El catálogo recibido del servidor no tiene el formato esperado.')
