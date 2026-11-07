@@ -24,7 +24,7 @@ def generate_pie_chart(name, labels, values):
     ax.set_title(f'Distribución de población - {name}')
     
     # Nombre del archivo guardado
-    plt.savefig(f'./imgs/{name}_pie.png', bbox_inches='tight')
+    plt.savefig('charts_pie_es_una_prueba.png')
     plt.close()
 
 if __name__ == '__main__':
