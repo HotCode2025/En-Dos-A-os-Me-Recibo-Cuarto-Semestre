@@ -49,3 +49,11 @@ test("un JSON mal formado responde 400 JSON", async () => {
   assert.equal(respuesta.status, 400);
   assert.deepEqual(await respuesta.json(), { error: "El cuerpo de la petición no es un JSON válido." });
 });
+
+test("CORS responde al front de Netlify y no a un origen ajeno", async () => {
+  const permitido = await fetch(`${base}/`, { headers: { Origin: "https://puntozeroecommerce.netlify.app" } });
+  assert.equal(permitido.headers.get("access-control-allow-origin"), "https://puntozeroecommerce.netlify.app");
+
+  const ajeno = await fetch(`${base}/`, { headers: { Origin: "https://evil.example" } });
+  assert.equal(ajeno.headers.get("access-control-allow-origin"), null);
+});

@@ -134,6 +134,12 @@ test("crearPreferencia agrega notification_url solo si BACKEND_PUBLIC_URL está 
   );
 });
 
+test("crearPreferencia no envía notification_url si BACKEND_PUBLIC_URL no está definido", async () => {
+  await pagoService.crearPreferencia(3, 7);
+
+  assert.equal(estado.preferenciaEnviada.notification_url, undefined);
+});
+
 test("crearPreferencia rechaza una orden de otro usuario con 404", async () => {
   await assert.rejects(pagoService.crearPreferencia(99, 7), { status: 404 });
   assert.equal(estado.preferenciaEnviada, undefined);

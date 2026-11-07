@@ -4,8 +4,10 @@ const { cargar } = require("./helpers");
 
 const { obtenerOrigenesPermitidos } = cargar("./src/config/cors");
 
-test("sin configuración mantiene los orígenes locales de siempre", () => {
-  assert.deepEqual(obtenerOrigenesPermitidos({}), ["http://localhost:5173", "http://localhost:3000"]);
+const NETLIFY = "https://puntozeroecommerce.netlify.app";
+
+test("sin configuración permite los orígenes locales y el front publicado en Netlify", () => {
+  assert.deepEqual(obtenerOrigenesPermitidos({}), ["http://localhost:5173", "http://localhost:3000", NETLIFY]);
 });
 
 test("CORS_ORIGIN acepta una lista separada por comas y normaliza barras finales", () => {
@@ -23,6 +25,7 @@ test("FRONTEND_URL se permite siempre, sin duplicados", () => {
   assert.deepEqual(obtenerOrigenesPermitidos({ FRONTEND_URL: "https://puntozero.app" }), [
     "http://localhost:5173",
     "http://localhost:3000",
+    NETLIFY,
     "https://puntozero.app",
   ]);
 });

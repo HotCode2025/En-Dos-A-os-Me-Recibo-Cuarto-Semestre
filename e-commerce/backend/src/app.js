@@ -1,13 +1,11 @@
 // src/app.js
-const express = require('express');
-const cors = require('cors'); // 
+const express = require("express");
+const cors = require("cors"); // 1. Importamos CORS
 const { obtenerOrigenesPermitidos } = require("./config/cors");
 const app = express();
 
-
-// 2. Configurar para que solo acepte tu URL de Netlify
-app.use(cors()); 
-// 2. Configuramos CORS: localhost por defecto, o CORS_ORIGIN / FRONTEND_URL en producción
+// Middlewares globales
+// 2. Configuramos CORS: localhost y el front de Netlify por defecto, o CORS_ORIGIN / FRONTEND_URL
 app.use(
   cors({
     origin: obtenerOrigenesPermitidos(),

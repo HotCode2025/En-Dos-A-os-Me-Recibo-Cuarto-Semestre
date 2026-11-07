@@ -13,10 +13,11 @@ Esta guía explica cómo levantar el proyecto desde cero en una máquina nueva.
 3. [Instalación paso a paso](#instalación-paso-a-paso)
 4. [Primeros pasos dentro de la aplicación](#primeros-pasos-dentro-de-la-aplicación)
 5. [Pagos con Mercado Pago](#pagos-con-mercado-pago)
-6. [Tests](#tests)
-7. [Problemas frecuentes](#problemas-frecuentes)
-8. [Referencia técnica](#referencia-técnica)
-9. [Limitaciones conocidas](#limitaciones-conocidas)
+6. [Deploy (Render + Netlify)](#deploy-render--netlify)
+7. [Tests](#tests)
+8. [Problemas frecuentes](#problemas-frecuentes)
+9. [Referencia técnica](#referencia-técnica)
+10. [Limitaciones conocidas](#limitaciones-conocidas)
 
 ---
 
@@ -137,9 +138,9 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 | `JWT_SECRET` | **Sí** | — | Clave con la que se firman los tokens de sesión |
 | `PORT` | No | `3001` | Puerto del servidor |
 | `FRONTEND_URL` | No | `http://localhost:5173` | A dónde vuelve el comprador después de pagar en Mercado Pago. También se agrega a los orígenes CORS permitidos |
-| `CORS_ORIGIN` | No | `http://localhost:5173`, `http://localhost:3000` | Orígenes permitidos, separados por coma |
+| `CORS_ORIGIN` | No | `http://localhost:5173`, `http://localhost:3000`, `https://puntozeroecommerce.netlify.app` | Orígenes permitidos, separados por coma. Si se define, reemplaza a los valores por defecto |
 | `MP_ACCESS_TOKEN` | Para pagar | — | Access token de Mercado Pago. En desarrollo, usar las **credenciales de prueba** (`TEST-...`) |
-| `BACKEND_PUBLIC_URL` | No | — | URL pública del backend. Si está definida, Mercado Pago notifica los pagos al webhook |
+| `BACKEND_PUBLIC_URL` | No | — | URL pública del backend, **sin** `/api/v1` (por ejemplo `https://ecommerce-backend-21u2.onrender.com`). Si está definida, Mercado Pago notifica los pagos a `<BACKEND_PUBLIC_URL>/api/v1/pagos/webhook` |
 | `MP_WEBHOOK_SECRET` | No | — | Clave para validar la firma de los webhooks de Mercado Pago |
 | `STOCK_AL_PAGAR_DESDE` | No | — | Fecha ISO (`2026-11-06`). Solo las órdenes posteriores reponen stock al cancelarse ya pagadas |
 
@@ -287,6 +288,44 @@ Mercado Pago **no acepta direcciones locales** como URL de retorno. En local:
 
 ---
 
+## Deploy (Render + Netlify)
+
+| Parte | Servicio | URL |
+|---|---|---|
+| Backend | Render (plan gratuito) | `https://ecommerce-backend-21u2.onrender.com` |
+| Frontend | Netlify | `https://puntozeroecommerce.netlify.app` |
+
+Las credenciales se cargan como variables de entorno en el panel de cada servicio; nunca se suben al repositorio.
+
+**Render (backend)** — además de `DATABASE_URL`, `JWT_SECRET` y `MP_ACCESS_TOKEN`:
+
+```env
+FRONTEND_URL=https://puntozeroecommerce.netlify.app
+BACKEND_PUBLIC_URL=https://ecommerce-backend-21u2.onrender.com
+```
+
+`BACKEND_PUBLIC_URL` va **sin** `/api/v1`: el backend le agrega `/api/v1/pagos/webhook`.
+
+**Netlify (frontend)** — configuración de referencia: directorio base `frontend`, comando `npm run build`, carpeta publicada `dist`, y la variable:
+
+```env
+VITE_API_BASE_URL=https://ecommerce-backend-21u2.onrender.com/api/v1
+```
+
+El archivo `frontend/public/_redirects` hace que Netlify sirva `index.html` en cualquier ruta, para que recargar `/productos` o volver de Mercado Pago a `/mis-ordenes` no dé 404.
+
+**CORS** — el backend solo responde a los orígenes de `config/cors.js` (localhost y la URL de Netlify) más `FRONTEND_URL`. Si el frontend cambia de dominio, agregarlo en `FRONTEND_URL` o `CORS_ORIGIN` en Render.
+
+### Primera carga lenta (cold start)
+
+El plan gratuito de Render apaga el servidor tras 15 minutos sin tráfico, y Neon suspende la base cuando está inactiva. La primera visita después de ese tiempo puede tardar entre 30 y 60 segundos en traer los productos; las siguientes responden en menos de un segundo.
+
+- El frontend guarda el último catálogo en `sessionStorage`: dentro de la misma pestaña, los productos aparecen al instante y se actualizan en segundo plano.
+- Para evitar el cold start, configurar un monitor gratuito (por ejemplo [cron-job.org](https://cron-job.org/) o [UptimeRobot](https://uptimerobot.com/)) que haga `GET https://ecommerce-backend-21u2.onrender.com/test-db` cada 10 minutos. Mantiene despiertos el servidor y la base. Las 750 horas mensuales del plan gratuito alcanzan para un servicio encendido todo el mes.
+- Las imágenes de los productos se cargan desde la URL guardada en la base. Usar imágenes livianas (idealmente menos de 200 KB); una imagen de varios MB demora la carga del catálogo.
+
+---
+
 ## Tests
 
 ```bash
@@ -328,7 +367,7 @@ El repositorio incluye un workflow de GitHub Actions (`.github/workflows/e-comme
 | Pagos | SDK oficial `mercadopago` (Checkout Pro) |
 | Base de datos | PostgreSQL (Neon) |
 | Tests | `node --test` (runner nativo) |
-| Deploy | Backend en Render: `https://ecommerce-backend-21u2.onrender.com` |
+| Deploy | Backend en Render, frontend en Netlify ([ver Deploy](#deploy-render--netlify)) |
 
 ### Estructura de carpetas
 
@@ -349,6 +388,7 @@ e-commerce/
 │       └── utils/               # Utilidades: JWT, hash, errores HTTP, normalización
 └── frontend/
     ├── vite.config.js           # Proxy de /api hacia http://localhost:3001
+    ├── public/_redirects        # Netlify: todas las rutas sirven index.html
     └── src/
         ├── main.js · router.js · App.vue
         ├── services/            # Cliente HTTP (api.js) y servicios por recurso
@@ -427,6 +467,7 @@ CREATE UNIQUE INDEX usuario_email_unico ON usuario (LOWER(email));
 | Mercado Pago en `localhost` | No hay redirección ni webhook; las órdenes se actualizan por conciliación activa |
 | Método de pago detectado por nombre | Se decide si un método usa Mercado Pago según su nombre ("Mercado Pago" o "Tarjeta"). Renombrarlo cambia el comportamiento |
 | Sin paginación | El catálogo y los listados se devuelven completos |
+| Cold start en Render | Con el plan gratuito, la primera visita tras 15 minutos sin tráfico tarda 30–60 s ([ver Deploy](#primera-carga-lenta-cold-start)) |
 | Sin límite de intentos | `/auth/login` y `/auth/register` no tienen rate limiting |
 | Sin envío de emails | No hay confirmaciones de compra por correo |
 

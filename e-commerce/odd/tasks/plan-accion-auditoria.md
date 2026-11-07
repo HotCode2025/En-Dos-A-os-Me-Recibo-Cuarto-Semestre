@@ -181,3 +181,24 @@ Ruta: delegated direct (un writer). TDD estricto `node --test`. Sin commits ni p
 - L47 (2026-11-06) T27 hecho. README: puertos 3001/5173, cómo crear ADMIN, índice único de email, los tres caminos de confirmación de pago (ref. `auditoria.md` §5.4) y sección "Limitaciones conocidas". `auditoria.md`: Iteración 4 con la revisión final, hallazgos y estado. Verificación final: backend 191/191, front build OK.
 - L48 (2026-11-06) Usuario: "actualiza el README dejando en claro como debe inicializar el proyecto alguien que nunca lo inicializó". README reescrito: inicio rápido, requisitos, instalación paso a paso (repo, base vía rama de Neon, backend/.env con plantilla, frontend/.env, verificación), primeros pasos (ADMIN, métodos de pago, roles), Mercado Pago, tests, problemas frecuentes, referencia técnica y limitaciones. Datos verificados contra el código (TRANSICIONES de ordenService, cors.js, env.js, workflow).
 - L49 (2026-11-06) Usuario pidió: (1) que los compañeros vean los mismos datos, (2) carrusel con todos los productos en el inicio, (3) README siempre actualizado. Hecho: README paso 2 reescrito (base compartida del equipo vía DATABASE_URL por canal privado, MP TEST token, cuenta admin de prueba; rama de Neon para pruebas destructivas); ProductCatalog prop `carousel` (scroll-snap, flechas accesibles, 4/3/2 columnas, prefers-reduced-motion) usado en HomeView sin límite; vite build OK. Regla README guardada en memoria y en e-commerce/CLAUDE.md.
+
+---
+
+# Revisión del deploy (Render + Netlify)
+
+Objetivo: corregir lo que dejó el deploy del 2026-11-06 y reducir la lentitud percibida del catálogo.
+Ruta: direct inline. TDD `node --test`. Sin commits ni producción; `.env` y base no se tocan.
+
+## Tareas
+
+- [x] T28 backend — quitar `app.use(cors())` (respondía `*` a cualquier origen); defaults CORS: localhost:5173, localhost:3000 y Netlify; `BACKEND_PUBLIC_URL` sin fallback (generaba `/api/v1/api/v1/pagos/webhook`)
+- [x] T29 front — `public/_redirects`; caché del catálogo en `sessionStorage`; `loading="lazy"` en el carrito; quitar `apiBaseUrl` muerto en `catalog.js`; restaurar `.env.example`
+- [x] T30 README — sección Deploy (variables de Render/Netlify, `_redirects`, CORS, cold start y keep-alive) y limitación de cold start
+
+## Log
+
+- L50 (2026-11-07) Usuario: "ponete al dia con el proyecto, revisa todo, ayer un compañero lo subio a render y netlyfy.app [...] yo particularmente noté que cargan lento los productos". Medido: API caliente ~0,6 s; causa principal cold start de Render free + Neon; imágenes de 2,5 MB y 700 KB hotlinkeadas. `curl -H "Origin: https://evil.example"` devolvía `access-control-allow-origin: *`. `/productos` en Netlify daba 404. Tests 189/191 (cors.test.js).
+- L51 (2026-11-07) Decisión del usuario: la URL de Netlify queda en los orígenes por defecto del código.
+- L52 T28 hecho. RED 4 fallando (2 de cors.test.js actualizados, CORS ajeno en app.test.js, notification_url sin variable en pagoService.test.js) → GREEN 193/193.
+- L53 T29 hecho. `npm run build` OK en copia limpia (el `node_modules` local es de Windows y no tiene el binding de rolldown para Linux); `dist/_redirects` presente.
+- L54 Pendiente del responsable: redeploy; en Render `BACKEND_PUBLIC_URL` sin `/api/v1`; monitor keep-alive a `/test-db`; reemplazar las imágenes pesadas en la base.

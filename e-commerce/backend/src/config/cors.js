@@ -1,8 +1,12 @@
-const ORIGENES_POR_DEFECTO = ["https://puntozeroecommerce.netlify.app", "http://localhost:3000"];
+const ORIGENES_POR_DEFECTO = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://puntozeroecommerce.netlify.app",
+];
 
 const normalizar = (url) => url.trim().replace(/\/+$/, "");
 
-// CORS_ORIGIN (lista separada por comas) reemplaza los orígenes locales; FRONTEND_URL siempre se permite.
+// CORS_ORIGIN (lista separada por comas) reemplaza los orígenes por defecto; FRONTEND_URL siempre se permite.
 function obtenerOrigenesPermitidos(env = process.env) {
   const configurados = (env.CORS_ORIGIN || "").split(",").map(normalizar).filter(Boolean);
   const origenes = configurados.length ? configurados : [...ORIGENES_POR_DEFECTO];

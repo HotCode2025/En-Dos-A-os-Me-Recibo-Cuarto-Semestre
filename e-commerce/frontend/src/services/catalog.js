@@ -20,14 +20,28 @@ function normalizeProduct(row) {
   }
 }
 
+// Último catálogo recibido: permite mostrar productos al instante mientras el backend
+// (que en Render puede estar despertando) responde. Si el storage falla, se ignora.
+const PRODUCTS_CACHE_KEY = 'puntozero:catalogo'
+
+function getCachedProducts() {
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(PRODUCTS_CACHE_KEY))
+    return Array.isArray(cached) ? cached.map(normalizeProduct) : null
+  } catch {
+    return null
+  }
+}
+
 async function getProducts() {
-  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/+$/, '')
-
-
-
   const rows = await apiRequest('/productos')
   if (!Array.isArray(rows)) {
     throw new Error('El catálogo recibido del servidor no tiene el formato esperado.')
+  }
+  try {
+    sessionStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(rows))
+  } catch {
+    // Sin storage disponible el catálogo funciona igual, solo sin caché.
   }
   return rows.map(normalizeProduct)
 }
@@ -40,4 +54,4 @@ async function getProductOptions() {
   return options
 }
 
-export { getProducts, getProductOptions, normalizeProduct }
+export { getProducts, getCachedProducts, getProductOptions, normalizeProduct }

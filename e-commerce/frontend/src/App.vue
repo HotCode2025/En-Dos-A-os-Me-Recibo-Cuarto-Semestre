@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { apiRequest } from "./services/api";
-import { getProducts, getProductOptions } from "./services/catalog";
+import { getProducts, getCachedProducts, getProductOptions } from "./services/catalog";
 import { accessToken, currentUser, isAdmin, logout } from "./stores/auth";
 import { EVENTO_AVISO } from "./utils/avisos";
 
@@ -423,14 +423,19 @@ function closeMobileMenu() {
 }
 
 async function loadCatalog() {
+  // Con un catálogo previo en caché se muestra al instante y se actualiza en segundo plano.
+  const cached = products.value.length ? null : getCachedProducts();
+  if (cached) products.value = cached;
   try {
-    catalogLoading.value = true;
+    catalogLoading.value = !products.value.length;
     catalogLoadError.value = "";
     products.value = await getProducts();
   } catch (error) {
     console.error("No se pudo cargar el catálogo desde el backend:", error);
-    catalogLoadError.value =
-      error.message || "No se pudo conectar con el catálogo.";
+    if (!products.value.length) {
+      catalogLoadError.value =
+        error.message || "No se pudo conectar con el catálogo.";
+    }
   } finally {
     catalogLoading.value = false;
   }
@@ -722,7 +727,7 @@ function signOut() {
               :key="product.id"
               class="cart-item"
             >
-              <img v-if="product.image" :src="product.image" :alt="product.imageAlt" />
+              <img v-if="product.image" :src="product.image" :alt="product.imageAlt" loading="lazy" decoding="async" />
               <div v-else class="cart-item-no-image" aria-hidden="true"></div>
               <div class="cart-item-info">
                 <span class="product-category">{{ product.brand }}</span>
