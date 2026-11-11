@@ -2556,13 +2556,13 @@ Object.assign(scheduleSets, window.butiniScheduleSets);
 // ==========================================================================
 const stopCoordinates = {
     // San Rafael Centro & Avenidas Principales
-    "Av. Balloffet e H. Yrigoyen (Centro)": [-34.6208, -68.3398],
-    "Moreno e H. Yrigoyen": [-34.6190, -68.3360],
-    "H. Yrigoyen y Almafuerte": [-34.6176, -68.3325],
+    "Av. Balloffet e H. Yrigoyen (Centro)": [-34.61344325731879, -68.33984382175827],
+    "Moreno e H. Yrigoyen": [-34.61401082433663, -68.335679769527],
+    "H. Yrigoyen y Almafuerte": [-34.615645292228486, -68.33182954927803],
     "Plaza San Martín": [-34.6166, -68.3330],
-    "Bolívar y Mitre": [-34.6162, -68.3245],
-    "Mitre y Edison (Centro)": [-34.6145, -68.3180],
-    "Mitre y Edison": [-34.6145, -68.3180],
+    "Bolívar y Mitre": [-34.624745287262726, -68.3051123597029],
+    "Mitre y Edison (Centro)": [-34.617457830548915, -68.32561648731924],
+    "Mitre y Edison": [-34.617457830548915, -68.32561648731924],
     "Mitre y Emilio Civit": [-34.6168, -68.3275],
     "Mitre y Tierra del Fuego": [-34.6130, -68.3110],
     "Av. Mitre y Patricias Mendocinas": [-34.6152, -68.3210],
@@ -2580,9 +2580,9 @@ const stopCoordinates = {
     "Amapola y Ruta Nacional 143": [-34.6440, -68.3465],
     "Amapola": [-34.6440, -68.3465],
     "Ruta Nacional 143 y Ejército de los Andes": [-34.6490, -68.3490],
-    "Quiroga y Ejército de los Andes": [-34.6540, -68.3520],
-    "Barrio Inalicán": [-34.6600, -68.3550],
-    "Izuel": [-34.6650, -68.3580],
+    "Quiroga y Ejército de los Andes": [-34.70507433211808, -68.36282484256033],
+    "Barrio Inalicán": [-34.735617475332376, -68.37314417803536],
+    "Izuel": [-34.73475045006534, -68.37920715167073],
     "Calle Cela": [-34.6720, -68.3590],
     "Los Pioneros y Callejón Venecia": [-34.6580, -68.3400],
 
